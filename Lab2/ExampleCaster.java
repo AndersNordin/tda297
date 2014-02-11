@@ -11,7 +11,7 @@ public class ExampleCaster extends Multicaster {
     /**
      * No initializations needed for this simple one
      */
-    private int leader;
+    private int leader = id;
     public void init() {
         mcui.debug("The network has "+hosts+" hosts!");
         leader = leaderElection();
@@ -36,8 +36,23 @@ public class ExampleCaster extends Multicaster {
      * @param message  The message received
      */
     public void basicreceive(int peer,Message message) {
-      ExampleMessage msg = (ExampleMessage)message;
-      mcui.deliver(peer, msg.getText());    
+      if(LeaderMessage.class.isInstance(message)){
+        LeaderMessage lmsg = (LeaderMessage)message;
+        mcui.debug("LeaderMessage");
+        int otherId = lmsg.getLeader();
+        int next = (id+1) % hosts;
+        if(otherId < leader){
+          leader = otherId;
+          bcom.basicsend(next,new LeaderMessage(next,leader));
+        }else if (leader < otherId) {
+          bcom.basicsend(next,new LeaderMessage(next,leader));
+        }else{
+          mcui.debug("Leader is chosen: "+leader);
+        }
+      }else{
+        ExampleMessage msg = (ExampleMessage)message;
+        mcui.deliver(peer, msg.getText());    
+      }
     }
 
     /**
@@ -48,5 +63,11 @@ public class ExampleCaster extends Multicaster {
      */
     public void basicpeerdown(int peer) {
         mcui.debug("Peer "+peer+" has been dead for a while now!");
+    }
+    public int leaderElection(){
+      int next = (id+1) % hosts;
+      mcui.debug("next: " +next);
+      bcom.basicsend(next,new LeaderMessage(next,leader));
+      return 1;
     }
 }
