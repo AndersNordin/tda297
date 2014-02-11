@@ -1,31 +1,24 @@
 
 import mcgui.*;
 
-public class Ticket extends Message {
-        
-    private String text;  
-    private long seqNr;
-    private int senderId;
-    /**
-     * constructor for sending a ack.
-     */
-    public ExampleMessage(int sender,String text) {
+public class Ticket extends Message {      
+    private long seqNr;   
+
+    /* 
+        Constructor for creating a new ticket.        
+    */
+    public Ticket(int sender, long seqNr){
         super(sender);
-        senderId=sender;
-        this.text = text;
+        this.seqNr = seqNr;
     }
     
-    /**
-     * Returns the text of the message only. The toString method can
-     * be implemented to show additional things useful for debugging
-     * purposes.
-     */
-    public String getText() {
-        return text;
+    public void setSeqNr(long seqNr) {
+        this.seqNr = seqNr;
     }
 
-    public int getSenderId(){
-      return senderId;
+    public int getSeqNr(){
+      return seqNr;
     }
+
     public static final long serialVersionUID = 0;
 }
