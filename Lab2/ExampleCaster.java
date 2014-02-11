@@ -11,13 +11,16 @@ public class ExampleCaster extends Multicaster {
     /**
      * No initializations needed for this simple one
      */
-    private int leader = id;
+    private int leader = Integer.MAX_VALUE;
     private static int seqNr;
     private String nextMessage = null;
+    private boolean hasLeader = null;
+
+
     public void init() {
         mcui.debug("The network has "+hosts+" hosts!");
-        leader = leaderElection();
         seqNr = 0;
+        hasLeader = false;
     }
         
     /**
@@ -32,6 +35,9 @@ public class ExampleCaster extends Multicaster {
      * @param message  The message received
      */
     public void basicreceive(int peer,Message message) {
+
+
+
       if(message instanceof Ticket){
         mcui.debug("Revcieved a ticket");
         Ticket ticket = (Ticket)message;
@@ -73,17 +79,25 @@ public class ExampleCaster extends Multicaster {
         mcui.deliver(id, nextMessage, "from myself!");
     }
     
-    public int leaderElection(){
-      /*
+    public int leaderElection(int forwardedID){
       int next = (id+1) % hosts;
-      mcui.debug("next: " +next);
+
+      if(forwardedID < leader){
+        leader = forwardedID;
+      }else if(forwardedID == leader){
+        mcui.debug("Finished");
+        return forwardedID;
+      }
       bcom.basicsend(next,new LeaderMessage(next,leader));
-      return 1;
-      */
-      return 0;
+           
+      return forwardedID;
     }
     public void askForTicket(String message){
       mcui.debug("Asking for ticket");
+      if(!hasLeader){
+        leader = leaderElection(id);  
+        hasLeader = true;     
+      }
       bcom.basicsend(leader,new Ticket(id));
       nextMessage = message;
 
