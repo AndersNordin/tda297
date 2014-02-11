@@ -12,23 +12,19 @@ public class ExampleCaster extends Multicaster {
      * No initializations needed for this simple one
      */
     private int leader = id;
+    private static int seqNr;
+    private String nextMessage = null;
     public void init() {
         mcui.debug("The network has "+hosts+" hosts!");
         leader = leaderElection();
+        seqNr = 0;
     }
         
     /**
      * The GUI calls this module to multicast a message
      */
     public void cast(String messagetext) {
-        for(int i=0; i < hosts; i++) {
-            /* Sends to everyone except itself */
-            if(i != id) {
-                bcom.basicsend(i,new ExampleMessage(id, messagetext));
-            }
-        }
-        mcui.debug("Sent message: \""+messagetext+"\"");
-        mcui.deliver(id, messagetext, "from myself!");
+      askForTicket(messagetext);
     }
     
     /**
@@ -36,18 +32,18 @@ public class ExampleCaster extends Multicaster {
      * @param message  The message received
      */
     public void basicreceive(int peer,Message message) {
-      if(LeaderMessage.class.isInstance(message)){
-        LeaderMessage lmsg = (LeaderMessage)message;
-        mcui.debug("LeaderMessage");
-        int otherId = lmsg.getLeader();
-        int next = (id+1) % hosts;
-        if(otherId < leader){
-          leader = otherId;
-          bcom.basicsend(next,new LeaderMessage(next,leader));
-        }else if (leader < otherId) {
-          bcom.basicsend(next,new LeaderMessage(next,leader));
+      if(message instanceof Ticket){
+        mcui.debug("Revcieved a ticket");
+        Ticket ticket = (Ticket)message;
+        if(ticket.getSeqNr() == null) {
+          if(leader == id){
+            mcui.debug("Populating ticket, and sending back");
+            ticket.setSeqNr(seqNr++);
+            bcom.basicsend(peer,ticket);
+          }
         }else{
-          mcui.debug("Leader is chosen: "+leader);
+          //Send message with ticket
+          multicastMessage(ticket);
         }
       }else{
         ExampleMessage msg = (ExampleMessage)message;
@@ -64,10 +60,33 @@ public class ExampleCaster extends Multicaster {
     public void basicpeerdown(int peer) {
         mcui.debug("Peer "+peer+" has been dead for a while now!");
     }
+    public void multicastMessage(Ticket ticket){
+      mcui.debug("Multicasting message");
+
+        for(int i=0; i < hosts; i++) {
+             //Sends to everyone except itself 
+            if(i != id) {
+                bcom.basicsend(i,new ExampleMessage(id, nextMessage,ticket));
+            }
+        }
+        mcui.debug("Sent message: \""+nextMessage+"\"");
+        mcui.deliver(id, nextMessage, "from myself!");
+    }
+    
     public int leaderElection(){
+      /*
       int next = (id+1) % hosts;
       mcui.debug("next: " +next);
       bcom.basicsend(next,new LeaderMessage(next,leader));
       return 1;
+      */
+      return 0;
     }
+    public void askForTicket(String message){
+      mcui.debug("Asking for ticket");
+      bcom.basicsend(leader,new Ticket(id));
+      nextMessage = message;
+
+    }
+
 }

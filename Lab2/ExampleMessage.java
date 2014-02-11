@@ -1,4 +1,3 @@
-
 import mcgui.*;
 
 /**
@@ -9,13 +8,14 @@ import mcgui.*;
 public class ExampleMessage extends Message {
         
     private String text;  
-    private long seqNr;
+    private Ticket ticket;
     private int senderId;
     /**
      * constructor for sending a ack.
      */
-    public ExampleMessage(int sender,String text) {
+    public ExampleMessage(int sender,String text,Ticket ticket) {
         super(sender);
+        this.ticket = ticket;
         senderId=sender;
         this.text = text;
     }
