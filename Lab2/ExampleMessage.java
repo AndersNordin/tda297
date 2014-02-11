@@ -10,6 +10,7 @@ public class ExampleMessage extends Message {
     private String text;  
     private Ticket ticket;
     private int senderId;
+    private String state = null;
     /**
      * constructor for sending a ack.
      */
@@ -27,6 +28,9 @@ public class ExampleMessage extends Message {
      */
     public String getText() {
         return text;
+    }
+    public Integer getSeqNr(){
+      return ticket.getSeqNr();
     }
 
     public int getSenderId(){

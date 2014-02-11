@@ -2,7 +2,7 @@
 import mcgui.*;
 
 public class Ticket extends Message {      
-    private Long seqNr = null;   
+    private Integer seqNr = null;   
 
     /* 
         Constructor for creating a new ticket.        
@@ -10,16 +10,16 @@ public class Ticket extends Message {
     public Ticket(int sender){
       super(sender);  
     }
-    public Ticket(int sender, Long seqNr){
+    public Ticket(int sender, Integer seqNr){
         super(sender);
         this.seqNr = seqNr;
     }
     
-    public void setSeqNr(long seqNr) {
+    public void setSeqNr(int seqNr) {
         this.seqNr = seqNr;
     }
 
-    public Long getSeqNr(){
+    public Integer getSeqNr(){
       return seqNr;
     }
 
