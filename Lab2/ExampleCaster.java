@@ -11,28 +11,24 @@ public class ExampleCaster extends Multicaster {
     /**
      * No initializations needed for this simple one
      */
-    private static long seqNr;
-    private static ArrayList<ExampleMessage> history = null;
+    private int leader;
     public void init() {
-	history = new ArrayList<ExampleMessage>();
         mcui.debug("The network has "+hosts+" hosts!");
-	seqNr = 0;
+        leader = leaderElection();
     }
         
     /**
      * The GUI calls this module to multicast a message
      */
     public void cast(String messagetext) {
-	long seqNumber = ++seqNr;
         for(int i=0; i < hosts; i++) {
             /* Sends to everyone except itself */
             if(i != id) {
-                bcom.basicsend(i,new ExampleMessage(id, messagetext,seqNumber));
+                bcom.basicsend(i,new ExampleMessage(id, messagetext));
             }
         }
-        mcui.debug("Sent message: \""+messagetext+"\" seq: "+seqNr);
+        mcui.debug("Sent message: \""+messagetext+"\"");
         mcui.deliver(id, messagetext, "from myself!");
-	history.add(new ExampleMessage(id,messagetext,seqNumber));
     }
     
     /**
@@ -40,22 +36,8 @@ public class ExampleCaster extends Multicaster {
      * @param message  The message received
      */
     public void basicreceive(int peer,Message message) {
-	ExampleMessage msg = (ExampleMessage)message;
-	if(msg.getSeqNr()>seqNr) {
-	    seqNr = msg.getSeqNr();
-	}
-	/**
-	 * if ack, then acknowledge this, else, treat it as a normal message
-	 * and answer with ack
-	 */
-	mcui.debug("Got message, is ack: "+msg.isAck());
-	if(msg.isAck()) {
-	    mcui.debug("Ack: "+msg.getSeqNr()+ " from: "+msg.getSenderId());
-	}else {
-	    bcom.basicsend(msg.getSenderId(),new ExampleMessage(id,true,seqNr));
-	    mcui.deliver(peer, msg.getText());    
-	}
-        		
+      ExampleMessage msg = (ExampleMessage)message;
+      mcui.deliver(peer, msg.getText());    
     }
 
     /**

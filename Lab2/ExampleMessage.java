@@ -10,25 +10,14 @@ public class ExampleMessage extends Message {
         
     private String text;  
     private long seqNr;
-    private boolean ack;
     private int senderId;
     /**
      * constructor for sending a ack.
      */
-    public ExampleMessage(int sender, boolean ack,long seqNr) {
-	super(sender);
-	this.ack = ack;
-	this.senderId = sender;
-	this.seqNr = seqNr;
-	text ="";
-    }
-
-    public ExampleMessage(int sender,String text,long seqNr) {
+    public ExampleMessage(int sender,String text) {
         super(sender);
-	senderId=sender;
+        senderId=sender;
         this.text = text;
-	this.seqNr = seqNr;
-	ack = false;
     }
     
     /**
@@ -39,14 +28,9 @@ public class ExampleMessage extends Message {
     public String getText() {
         return text;
     }
-    public long getSeqNr() { 
-	return seqNr;
-    }
-    public boolean isAck(){
-	return ack;
-    }
+
     public int getSenderId(){
-	return senderId;
+      return senderId;
     }
     public static final long serialVersionUID = 0;
 }
