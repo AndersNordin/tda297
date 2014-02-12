@@ -15,15 +15,19 @@ public class ExampleCaster extends Multicaster {
     private int lastAck = -1;
     private String nextMessage = null;
     private ArrayList<ExampleMessage> buffer;
-    private boolean hasLeader = false;
 
-    
     public void init() {
         buffer = new ArrayList<ExampleMessage>();
         mcui.debug("The network has "+hosts+" hosts!");
         seqNr = 0;
-        //hasLeader = false;
-        leader = 0;
+        leader = Integer.MAX_VALUE;
+        //Allow for everyone to start!
+        try{
+          Thread.sleep(500);
+        }catch(Exception e){
+          mcui.debug("Something happened with initial wait!");
+        }
+        leaderElection(id);
     }
         
     /**
@@ -38,7 +42,12 @@ public class ExampleCaster extends Multicaster {
      * @param message  The message received
      */
     public void basicreceive(int peer,Message message) {
-      if(message instanceof Ticket){
+      if(message instanceof LeaderMessage){
+        LeaderMessage lmsg = (LeaderMessage)message;
+        mcui.debug("Got leadermessage! proposed: " + lmsg.getLeader());
+
+        leaderElection(lmsg.getLeader());
+      }else if(message instanceof Ticket){
         Ticket ticket = (Ticket)message;
         handleTicket(peer,ticket);
 
@@ -98,8 +107,13 @@ public class ExampleCaster extends Multicaster {
      */
     public void basicpeerdown(int peer) {
         mcui.debug("Peer "+peer+" has been dead for a while now!");
+        if(peer == leader) {
+          mcui.debug("New leader is needed!");
+          leader = Integer.MAX_VALUE;
+          leaderElection(id);
+        }
     }
-    public void multicastMessage(Ticket ticket){
+    private void multicastMessage(Ticket ticket){
       mcui.debug("Multicasting message");
         for(int i=0; i < hosts; i++) {
              //Sends to everyone except itself 
@@ -116,25 +130,25 @@ public class ExampleCaster extends Multicaster {
         }else{
           buffer.add(msg);
         }
-        //mcui.deliver(id, nextMessage, "from myself!");
     }
     
-    public int leaderElection(int forwardedID){
-      /*
+    private void leaderElection(int proposedLeader){
+      //mcui.debug("Leader election proposed: "+ proposedLeader);
       int next = (id+1) % hosts;
-
-      if(forwardedID < leader){
-        leader = forwardedID;
-      }else if(forwardedID == leader){
-        mcui.debug("Finished");
-        return forwardedID;
+      if(id < proposedLeader && proposedLeader<leader){
+        mcui.debug("leader = "+id);
+        leader = id; 
+      }else if(proposedLeader < leader){
+        leader = proposedLeader;
+      }else if(proposedLeader  == leader){
+        mcui.debug("Leader is found! "+leader);
+        return;
       }
+      mcui.debug("Proposed leader: "+ proposedLeader+" current leader: "+leader);
       bcom.basicsend(next,new LeaderMessage(next,leader));
-      return forwardedID;
-      */
-      return 0;
+      return;
     }
-    public void askForTicket(String message){
+    private void askForTicket(String message){
       /*
       if(!hasLeader){
         leader = leaderElection(id);  
