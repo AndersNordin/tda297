@@ -15,12 +15,12 @@ public class ExampleCaster extends Multicaster {
     private static int seqNr;
     private int lastAck = -1;
     private String nextMessage = null;
-    private ArrayList<ExampleMessage> buffer;
+    private HashSet<ExampleMessage> buffer;
     private ArrayList<String> sendBuffer;
 
     public void init() {
         sendBuffer = new ArrayList<String>();
-        buffer = new ArrayList<ExampleMessage>();
+        buffer = new HashSet<ExampleMessage>();
         mcui.debug("The network has "+hosts+" hosts!");
         seqNr = 0;
         leader = Integer.MAX_VALUE;
@@ -60,26 +60,38 @@ public class ExampleCaster extends Multicaster {
         LeaderMessage lmsg = (LeaderMessage)message;
         //mcui.debug("Got leadermessage! proposed: " + lmsg.getLeader());
         leaderElection(lmsg.getLeader());
+
       }else if(message instanceof Ticket){
         Ticket ticket = (Ticket)message;
         handleTicket(peer,ticket);
 
       }else if (message instanceof ExampleMessage){
         ExampleMessage msg = (ExampleMessage)message;
+        int seq = msg.getSeqNr();
+        mcui.debug("seq: "+seq);
         if(msg.getFlood()){
           mcui.debug("Flooding");
           flood(msg,peer);
         }
-        int seq = msg.getSeqNr();
-        mcui.debug("seq: "+seq);
-        if(seq!=lastAck){
+/*
+        if(lastAck < seq) {
+          for(ExampleMessage em : buffer){
+            if(em.getSeqNr() == seq){
+              return;
+            }
+          }
+        }
+*/
+        if(seq>lastAck){
           if(canDeliver(msg)){
+            lastAck++;
             mcui.deliver(peer, msg.getText());    
             tryBuffer();
           }else{
             buffer.add(msg);
           }
         }
+
       }else{
         mcui.debug("ERROR: unkown message!!");
       }
@@ -97,8 +109,6 @@ public class ExampleCaster extends Multicaster {
     }
     private boolean canDeliver(ExampleMessage msg){
       if(lastAck+1 == msg.getSeqNr()){
-        lastAck++;
-        seqNr++;
         return true;
       }
       return false;
@@ -123,7 +133,7 @@ public class ExampleCaster extends Multicaster {
         if(ticket.getSeqNr() == null) {
           if(leader == id){
             mcui.debug("Populating ticket, and sending back");
-            ticket.setSeqNr(seqNr);
+            ticket.setSeqNr(seqNr++);
             bcom.basicsend(peer,ticket);
           }
         }else{
@@ -144,7 +154,7 @@ public class ExampleCaster extends Multicaster {
           leader = Integer.MAX_VALUE;
           leaderElection(id);
         }
-        sendBuffer.add(nextMessage);
+        sendBuffer.add(0,nextMessage);
     }
     private void multicastMessage(Ticket ticket){
       mcui.debug("Multicasting message");
