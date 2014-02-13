@@ -11,30 +11,44 @@ public class ExampleCaster extends Multicaster {
      * No initializations needed for this simple one
      */
     private int leader;//Denna borde vi kunna sätta till hosts, dvs den med störst id?
+    private boolean hasLeader;
     private static int seqNr;
     private int lastAck = -1;
     private String nextMessage = null;
     private ArrayList<ExampleMessage> buffer;
+    private ArrayList<String> sendBuffer;
 
     public void init() {
+        sendBuffer = new ArrayList<String>();
         buffer = new ArrayList<ExampleMessage>();
         mcui.debug("The network has "+hosts+" hosts!");
         seqNr = 0;
         leader = Integer.MAX_VALUE;
-        //Allow for everyone to start!
+        //Allow for everyone to start! A possible solution to this is to 
+        //assume 0 as the first leader, and if it isnt a leader select a new one
+        /*
         try{
           Thread.sleep(500);
         }catch(Exception e){
           mcui.debug("Something happened with initial wait!");
         }
         leaderElection(id);
+        */
+        //Leader election
+        leader = 0;
+        hasLeader = true;
     }
         
     /**
      * The GUI calls this module to multicast a message
      */
     public void cast(String messagetext) {
-      askForTicket(messagetext);
+      if(hasLeader){
+        askForTicket(messagetext);
+      }else{
+        mcui.debug("Adding to sendBuffer");
+        sendBuffer.add(0,messagetext);
+      }
     }
     
     /**
@@ -44,8 +58,7 @@ public class ExampleCaster extends Multicaster {
     public void basicreceive(int peer,Message message) {
       if(message instanceof LeaderMessage){
         LeaderMessage lmsg = (LeaderMessage)message;
-        mcui.debug("Got leadermessage! proposed: " + lmsg.getLeader());
-
+        //mcui.debug("Got leadermessage! proposed: " + lmsg.getLeader());
         leaderElection(lmsg.getLeader());
       }else if(message instanceof Ticket){
         Ticket ticket = (Ticket)message;
@@ -53,20 +66,39 @@ public class ExampleCaster extends Multicaster {
 
       }else if (message instanceof ExampleMessage){
         ExampleMessage msg = (ExampleMessage)message;
+        if(msg.getFlood()){
+          mcui.debug("Flooding");
+          flood(msg,peer);
+        }
         int seq = msg.getSeqNr();
-        if(canDeliver(msg)){
-          mcui.deliver(peer, msg.getText());    
-          tryBuffer();
-        }else{
-          buffer.add(msg);
+        mcui.debug("seq: "+seq);
+        if(seq!=lastAck){
+          if(canDeliver(msg)){
+            mcui.deliver(peer, msg.getText());    
+            tryBuffer();
+          }else{
+            buffer.add(msg);
+          }
         }
       }else{
         mcui.debug("ERROR: unkown message!!");
       }
     }
+    private void flood(ExampleMessage msg,int peer) {
+      msg.flood();
+        for(int i=0; i < hosts; i++) {
+             //Sends to everyone except itself 
+            if(i != id && i != peer) {
+                mcui.debug("Sending flood to: "+i);
+                bcom.basicsend(i,msg);
+            }
+        }
+        mcui.debug("Flooded message: \""+msg.getText()+"\"");
+    }
     private boolean canDeliver(ExampleMessage msg){
       if(lastAck+1 == msg.getSeqNr()){
         lastAck++;
+        seqNr++;
         return true;
       }
       return false;
@@ -91,7 +123,7 @@ public class ExampleCaster extends Multicaster {
         if(ticket.getSeqNr() == null) {
           if(leader == id){
             mcui.debug("Populating ticket, and sending back");
-            ticket.setSeqNr(seqNr++);
+            ticket.setSeqNr(seqNr);
             bcom.basicsend(peer,ticket);
           }
         }else{
@@ -112,12 +144,14 @@ public class ExampleCaster extends Multicaster {
           leader = Integer.MAX_VALUE;
           leaderElection(id);
         }
+        sendBuffer.add(nextMessage);
     }
     private void multicastMessage(Ticket ticket){
       mcui.debug("Multicasting message");
         for(int i=0; i < hosts; i++) {
              //Sends to everyone except itself 
             if(i != id) {
+                mcui.debug("Sending to: "+i+" id: " + id);
                 bcom.basicsend(i,new ExampleMessage(id, nextMessage,ticket));
             }
         }
@@ -131,34 +165,36 @@ public class ExampleCaster extends Multicaster {
           buffer.add(msg);
         }
     }
-    
+    private void multicastFromBuffer() {
+      for(String msg : sendBuffer) {
+        mcui.debug("Sending from sendBuffer: "+msg);
+        cast(msg);
+      }
+    }
     private void leaderElection(int proposedLeader){
-      //mcui.debug("Leader election proposed: "+ proposedLeader);
       int next = (id+1) % hosts;
+      mcui.debug("next: "+next);
       if(id < proposedLeader && proposedLeader<leader){
-        mcui.debug("leader = "+id);
+      //  mcui.debug("leader = "+id);
         leader = id; 
       }else if(proposedLeader < leader){
         leader = proposedLeader;
       }else if(proposedLeader  == leader){
-        mcui.debug("Leader is found! "+leader);
+        mcui.debug("Has leader");
+        hasLeader = true;      
+        multicastFromBuffer();
+       // mcui.debug("Leader is found! "+leader);
         return;
       }
-      mcui.debug("Proposed leader: "+ proposedLeader+" current leader: "+leader);
+      //mcui.debug("Proposed leader: "+ proposedLeader+" current leader: "+leader);
       bcom.basicsend(next,new LeaderMessage(next,leader));
       return;
     }
+
     private void askForTicket(String message){
-      /*
-      if(!hasLeader){
-        leader = leaderElection(id);  
-        hasLeader = true;     
-      }
-      */
       mcui.debug("Asking for ticket");
       bcom.basicsend(leader,new Ticket(id));
       nextMessage = message;
-
     }
 
 }

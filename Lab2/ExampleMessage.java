@@ -11,6 +11,7 @@ public class ExampleMessage extends Message {
     private Ticket ticket;
     private int senderId;
     private String state = null;
+    private boolean flood = true;
     /**
      * constructor for sending a ack.
      */
@@ -28,6 +29,12 @@ public class ExampleMessage extends Message {
      */
     public String getText() {
         return text;
+    }
+    public void flood(){
+      flood = false;
+    }
+    public boolean getFlood(){
+      return flood;
     }
     public Integer getSeqNr(){
       return ticket.getSeqNr();
