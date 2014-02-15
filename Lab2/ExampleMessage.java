@@ -39,6 +39,9 @@ public class ExampleMessage extends Message {
     public Integer getSeqNr(){
       return ticket.getSeqNr();
     }
+    public int getRecipient() {
+      return ticket.getRecipient();
+    }
 
     public int getSenderId(){
       return senderId;
