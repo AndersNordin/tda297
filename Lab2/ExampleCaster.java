@@ -119,7 +119,7 @@ public class ExampleCaster extends Multicaster {
       for(ExampleMessage msg : receiveBuffer) {
         if(lastAck+1 == msg.getSeqNr()){
           mcui.debug("Deliver and set sequence num to " + msg.getSeqNr());
-          seqNr = msg.getSeqNr();
+          seqNr = msg.getSeqNr()+1;
           if(msg.getRecipient()==id){
             sendBuffer.remove();
           }
