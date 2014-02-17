@@ -58,7 +58,6 @@ public class ExampleCaster extends Multicaster {
     public void basicreceive(int peer,Message message) {
       if(message instanceof LeaderMessage){
         LeaderMessage lmsg = (LeaderMessage)message;
-        //leaderElection(lmsg.getLeader());
         leader =  lmsg.getLeader();
         mcui.debug("Leader is: "+leader);
         if(sendBuffer.size() != 0){
@@ -187,13 +186,6 @@ public class ExampleCaster extends Multicaster {
             }
           }
         }
-        /*
-        if(sendBuffer.size() != 0){
-          for(String s : sendBuffer){
-            askForTicket(s);
-          }
-        }
-        */
     }
 
     /*
@@ -228,6 +220,10 @@ public class ExampleCaster extends Multicaster {
       }
     }
 
+    /*
+    * Elect the next host which is alive and return id.
+    * If all are dead return -1.
+    */
     private int leaderElection(int proposedLeader){
       for(int i = 0; i < alive.length;i++){
         if(alive[i] == 1) {

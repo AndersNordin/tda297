@@ -1,13 +1,15 @@
 import mcgui.*;
 
-public class Ticket extends Message {      
+public class Ticket extends Message {  
+
     private Integer seqNr = null;   
     private int recipient;
     private boolean flood;
-    private MessageText message;
+    private MessageText message;    
+    public static final long serialVersionUID = 0;
 
     /* 
-        Constructor for creating a new ticket.        
+    *  First constructor for creating a new ticket.       
     */
     public Ticket(int sender,MessageText msg){
       super(sender);  
@@ -15,23 +17,34 @@ public class Ticket extends Message {
       message = msg;
       recipient = sender;
     }
+
+    /*
+    * Second constructor for creating a new ticket.
+    */
     public Ticket(int sender, Integer seqNr){
         super(sender);
         this.seqNr = seqNr;
     }
     
+    /*
+    * Get and Set methods.
+    */ 
     public void setRecipient(int rec){
       recipient = rec;
     }
-    public String getMessage(){
-      return message.getMsg();
-    }
-    public int getMessageId(){
-      return message.getId();
-    }
+
     public int getRecipient(){
       return recipient;
     }
+
+    public String getMessage(){
+      return message.getMsg();
+    }
+
+    public int getMessageId(){
+      return message.getId();
+    }
+
     public void setSeqNr(int seqNr) {
         this.seqNr = seqNr;
     }
@@ -39,12 +52,16 @@ public class Ticket extends Message {
     public Integer getSeqNr(){
       return seqNr;
     }
+
+    /* 
+    * A ticket is initially flood = true.
+    * Tickets may only be flooded once.
+    */
     public void flood() {
       flood = false; 
     }
+
     public boolean getFlood() {
       return flood;
     }
-
-    public static final long serialVersionUID = 0;
 }
