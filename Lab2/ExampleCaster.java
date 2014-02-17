@@ -71,11 +71,12 @@ public class ExampleCaster extends Multicaster {
         }
         if(seq > lastAck){
           if(canDeliver(msg)){
-            if(msg.getRecipient()==id){
+            if(msg.getRecipient() == id){
               sendBuffer.remove();
             }
             if(id != leader) {
-              seqNr = msg.getSeqNr();
+              //mcui.debug("Setting new seqNr: "+msg.getSeqNr());
+              seqNr = msg.getSeqNr()+1;
             }
             mcui.deliver(msg.getSender(), msg.getText());    
             tryBuffer();
