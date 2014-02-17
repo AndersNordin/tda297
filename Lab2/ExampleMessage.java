@@ -42,6 +42,9 @@ public class ExampleMessage extends Message {
     public int getRecipient() {
       return ticket.getRecipient();
     }
+    public int getMessageId(){
+      return ticket.getMessageId();
+    }
 
     public int getSenderId(){
       return senderId;

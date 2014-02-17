@@ -4,12 +4,12 @@ public class Ticket extends Message {
     private Integer seqNr = null;   
     private int recipient;
     private boolean flood;
-    private String message;
+    private MessageText message;
 
     /* 
         Constructor for creating a new ticket.        
     */
-    public Ticket(int sender,String msg){
+    public Ticket(int sender,MessageText msg){
       super(sender);  
       flood = true;
       message = msg;
@@ -24,7 +24,10 @@ public class Ticket extends Message {
       recipient = rec;
     }
     public String getMessage(){
-      return message;
+      return message.getMsg();
+    }
+    public int getMessageId(){
+      return message.getId();
     }
     public int getRecipient(){
       return recipient;
