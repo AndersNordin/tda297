@@ -7,6 +7,7 @@ import mcgui.*;
  * @author Andreas Larsson &lt;larandr@chalmers.se&gt;
  */
 public class ExampleCaster extends Multicaster {
+    private LinkedList<Integer> waiting;
     private int leader;
     private boolean hasLeader;
     private int[] alive;
@@ -28,6 +29,7 @@ public class ExampleCaster extends Multicaster {
         alive[i] = 1;
       }
 
+      waiting = new LinkedList<Integer>();
       sendBuffer = new LinkedList<MessageText>();
       receiveBuffer = new LinkedList<ExampleMessage>();
       mcui.debug("The network has "+hosts+" hosts!");
@@ -50,13 +52,61 @@ public class ExampleCaster extends Multicaster {
         mcui.debug("Adding to sendBuffer");
       }
     }
+    public boolean allPresent(){
+      for(int i = 0;i<hosts;i++){
+        if(alive[i] == 1 && i != id){
+          if(!waiting.contains(i)){
+            return false;
+          }
+        }
+      }
+      mcui.debug("everybody is here!");
+      return true;
+    }
+
+    public void sendLeader(){
+      mcui.debug("Sending leader to everyone!");
+      if( leader == id ){
+        for ( int i = 0;i<hosts;i++){
+          if(alive[i] == 1 && i != leader ){
+            mcui.debug("Sending to: "+i);
+            bcom.basicsend(i,new LeaderMessage(id,id));
+          }
+        }
+        if(sendBuffer.size() != 0){
+          for(MessageText s : sendBuffer){
+            askForTicket(s);
+          }
+        }
+      }
+    }
 
     /**
      * Receive a basic message
      * @param message  The message received
      */
     public void basicreceive(int peer,Message message) {
+
       if(message instanceof LeaderMessage){
+        LeaderMessage lmsg = (LeaderMessage)message;
+        mcui.debug("lmsg.leader: "+lmsg.getLeader()+" from: "+peer);
+        waiting.add(peer);
+        if(id == leader){
+          if(allPresent()){
+            sendLeader();
+          }
+        }else{
+          leader = lmsg.getLeader();
+          seqNr++;
+          mcui.debug("Send all data to leader!");
+          if(sendBuffer.size() != 0){
+            for(MessageText s : sendBuffer){
+              askForTicket(s);
+            }
+          }
+        }
+       
+      /*
         LeaderMessage lmsg = (LeaderMessage)message;
         leader =  lmsg.getLeader();
         mcui.debug("Leader is: "+leader);
@@ -65,7 +115,7 @@ public class ExampleCaster extends Multicaster {
             askForTicket(s);
           }
         }
-
+      */
       }else if(message instanceof Ticket){
         Ticket ticket = (Ticket)message;
         handleTicket(peer,ticket);
@@ -88,7 +138,7 @@ public class ExampleCaster extends Multicaster {
             if(id != leader) {
               seqNr = msg.getSeqNr()+1;
             }
-            mcui.deliver(msg.getSender(), msg.getText());    
+            mcui.deliver(msg.getSender(), msg.getText()+" : "+msg.getSeqNr());    
             tryBuffer();
           }else{
             receiveBuffer.add(msg);
@@ -140,7 +190,7 @@ public class ExampleCaster extends Multicaster {
           if(msg.getRecipient()==id){
             sendBuffer.remove();
           }
-          mcui.deliver(msg.getSender(), msg.getText());    
+          mcui.deliver(msg.getSender(), msg.getText()+": "+msg.getSeqNr());    
           receiveBuffer.remove(msg);
           lastAck++;
           tryBuffer();
@@ -179,12 +229,10 @@ public class ExampleCaster extends Multicaster {
           leader = leaderElection(id);
           mcui.debug("New leader is: "+ leader);
         }
-        if( leader == id ){
-          for ( int i = 0;i<hosts;i++){
-            if(alive[i] == 1){
-              bcom.basicsend(i,new LeaderMessage(id,id));
-            }
-          }
+        if( leader != id ) {
+          bcom.basicsend(leader,new LeaderMessage(id,leader));
+        } else if(leader == id && allPresent() ){
+          sendLeader(); 
         }
     }
 
@@ -205,7 +253,7 @@ public class ExampleCaster extends Multicaster {
           if(msg.getRecipient()==id){
             sendBuffer.remove();
           }
-          mcui.deliver(msg.getSender(), msg.getText());    
+          mcui.deliver(msg.getSender(), msg.getText()+" : "+msg.getSeqNr());    
           mcui.debug("SendBuffer: "+sendBuffer.size());
           tryBuffer();
         }else{
