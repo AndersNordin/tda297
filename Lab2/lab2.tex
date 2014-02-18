@@ -21,6 +21,9 @@
 \section{Introduction}
   This report describes some of the problems of distributed network and how to maintain total order 
   as well as causal order in a system that has reliable unicast FIFO order messaging.\\
+  In this solution a single node is elected as a sequencer and all messages is sent through
+  the sequencer and it will then singlehandedly add sequence numbers and then multicast it
+  to all other nodes.
   The report will start with a short description of the system and what algorithms used. 
   Then reliability is discussed and how the system solve integrity, validity and agreement.
   After that an explanation of how the system holds for total and causal order. Then there 
@@ -43,7 +46,7 @@
  In order to then create the correct order, the messages is not delivered directly when
  it is received, but is instead put in a queue until the correct sequence number is acquired.\\
  \subsection{Example}
- Example of two functioning nodes with a sequencer. The message sent tot he sequencer is 
+ Example of two functioning nodes with a sequencer. The message sent to the sequencer is 
  represented by a wavy arrow, and the messages with a sequence number is represented by normal
  arrows.
   \begin{figure}[h]
@@ -137,13 +140,16 @@
     The nodes will then send the messages it was unable to send to the previous sequencer to the
     new sequencer, and they will then be multicasted and removed from the buffer to inform the nodes
     that the message is infact broadcasted.
+
   \subsection{Agreement}
     When a new sequencer is elected, the elected process will send a special message to the other nodes
     that it is the new sequencer, hence the single one is elected, and it and only itself sends the 
     messages to all other nodes to be updated, no one will be without a notion of the new leader
+
   \subsection{Ordering}
-    If the sequencer dies, then the nodes will buffer their messages. Thiese messages 
-    each process buffer while sequencer is dead will be concurrent, and no need for flooding or special
+    If the sequencer dies, then the nodes will buffer their messages untill it is received. 
+    All theise messages will then be concurrent if the sequencer is dead, hence no one can 
+    deliver a message untill a new sequencer is elected, and no need for flooding or special
     ordering is needed. When the new sequencer is found the nodes just have to send their messages as soon
     as possible, but before anything else, to the sequencer. Hence causal order will be preserved, no one
     can recieve messages while the sequencer is dead and they will be causally concurrent. The new sequencer
@@ -151,4 +157,8 @@
     hence it is buffered in each node and then delivered according to sequence numbers.
     
 \section{Conclusion}
+  The solution might seem crude at a beginning, but the fact is that the message complexity
+  is rather good in this solution. The bad thing is that it sends alot of data through the 
+  sequencer. and the node that acts as a sequencer might be overloaded with messages, and if 
+  it dies no one will be able to send any messages untill the new one is elected.
 \end{document}
