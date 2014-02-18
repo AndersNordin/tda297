@@ -79,6 +79,7 @@ public class ExampleCaster extends Multicaster {
           }
         }
       }
+      waiting.clear();
     }
 
     /**

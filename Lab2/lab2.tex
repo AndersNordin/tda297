@@ -133,6 +133,15 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
   will get a message with a sequence number.
   
 \subsection{Causal order}
+  %Each message has to be sent by one single process S in the group g.
+  Assume towards contradiction there can exist a message sequence
+  that breaks causal order, then a process $P$ has to recieve a message $m_1$
+  after that send a message $m_2$ this causes $m_1$ and $m_2$ to be causally
+  related, to break the causal order, message $m_2$ has to be percieved by all
+  nodes before $m_1$, but this is a contradiction hence message $m_1$ has to have
+  a sequence number when it is recieved by $P$ and $m_2$ will get a higher sequence
+  number when it is sent to the sequencer, and the nodes deliver the messages according
+  to the sequence numbers.
 \section{Fault tolerance}
   Fault tolerance in failing nodes is already described in section \ref{reliability}.
   An important notice that is not to be forgotten is the sequencer. If the sequencer 
@@ -171,7 +180,13 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
     
 \section{Conclusion}
   The solution might seem crude at a beginning, but the fact is that the message complexity
-  is rather good in this solution. The bad thing is that it sends alot of data through the 
-  sequencer. and the node that acts as a sequencer might be overloaded with messages, and if 
-  it dies no one will be able to send any messages untill the new one is elected.
+  is rather good in this solution.To broadcast a message, one message is sent to the sequencer and then N 
+  messages is sent to each node, where N is the number of nodes in the group, as opposed to a aproach
+  where each node has to agree on a sequence before the message is sent. This generates order of N messages
+  even before the message is sent, then the message has to be multicasted, making the message complexity
+  being atleast double. Although, one have to keep in mind that our solution sends a whole message
+  to the sequencer, and the agreement aproach just has to agree on sequence, which can be done with
+  small messages. The bad thing is that it sends alot of data through the sequencer and the node 
+  that acts as a sequencer might be overloaded with messages, and if it dies no one will be able 
+  to send any messages untill the new one is elected.
 \end{document}
