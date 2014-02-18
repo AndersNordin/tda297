@@ -89,20 +89,33 @@
 % Same as validity, if it applies for one it applies for all.
 
 \section{Ordering}
-It is important in the protocol that the order of the messages is the same for all members of the network. Therefore in the following subsection it is described how the protocol satisfy total and causal order.
+  It is important in the protocol that the order of the messages is the same 
+  for all members of the network. Therefore in the following subsection it is 
+  described how the protocol satisfy total and causal order.
 
 \subsection{Total order}
-  The sequencer is the only one that takes care of the ordering. No one else is allowed to set a sequence numbers. If a message is sent, it has to be passed to the sequencer, get a sequence number, and then it is delivered back by a broadcast. When it is recieved it is not delivered, it has to be put to a queue untill the message with the next sequence number if found. Hence there is only one node that is allowed to set sequence numbers, and the  sequence numbers is unique, all the nodes will get a message with a sequence number.
+  The sequencer is the only one that takes care of the ordering. 
+  No one else is allowed to set a sequence numbers. If a message 
+  is sent, it has to be passed to the sequencer, get a sequence 
+  number, and then it is delivered back by a broadcast. When it 
+  is recieved it is not delivered, it has to be put to a queue 
+  untill the message with the next sequence number if found. 
+  Hence there is only one node that is allowed to set sequence 
+  numbers, and the  sequence numbers is unique, all the nodes 
+  will get a message with a sequence number.
   
 \subsection{Causal order}
 \section{Fault tolerance}
   Fault tolerance in failing nodes is already described in section \ref{reliability}.
-  An important notice that is not to be forgotten is the sequencer. If the sequencer dies, a new sequencer has to be elected and integrity, validity and agreement will still be preserved.
- 
+  An important notice that is not to be forgotten is the sequencer. If the sequencer 
+  dies, a new sequencer has to be elected and integrity, validity and agreement will 
+  still be preserved aswell as ordering.
   \subsection{Integrity}
     When a node is sending a message, one and only one, is created and then put in a queue.
     the message together with an unique id specific for that processor. When the message then is 
-    received from the broadcast it is then removed. This means that if and only if a message is sent, it    will be present in the sending nodes send buffer, and if and only if the message is broadcasted it is removed from the buffer. No where will it be duplicates.
+    received from the broadcast it is then removed. This means that if and only if a message is 
+    sent, it    will be present in the sending nodes send buffer, and if and only if the message
+    is broadcasted it is removed from the buffer. No where will it be duplicates.
     
   \subsection{Validity}
     If a node containing the sequencer crashes, the other nodes will place their messages in their
@@ -116,6 +129,14 @@ It is important in the protocol that the order of the messages is the same for a
     When a new sequencer is elected, the elected process will send a special message to the other nodes
     that it is the new sequencer, hence the single one is elected, and it and only itself sends the 
     messages to all other nodes to be updated, no one will be without a notion of the new leader
+  \subsection{Ordering}
+    If the sequencer dies, then the nodes will buffer their messages. Thiese messages 
+    each process buffer while sequencer is dead will be concurrent, and no need for flooding or special
+    ordering is needed. When the new sequencer is found the nodes just have to send their messages as soon
+    as possible, but before anything else, to the sequencer. Hence causal order will be preserved, no one
+    can recieve messages while the sequencer is dead and they will be causally concurrent. The new sequencer
+    will set sequencer numbers and multicast the message exactly as before so total order is also preserved
+    hence it is buffered in each node and then delivered according to sequence numbers.
     
 \section{Conclusion}
 \end{document}
