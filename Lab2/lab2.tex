@@ -1,3 +1,4 @@
+
 \documentclass{article}
 \title{TDA297 Laboration 2}
 \author{anordin@student.chalmers.se\quad Anders Nordin\\
@@ -95,7 +96,7 @@
   
 \subsection{Integrity}
 As the messages arrive at the process it is stored in a buffer implemented as a set. With the help of sequence numbers
-it is possible to assure that the message is only beeing delivered once. The process only delivers the message if it
+it is possible to assure that the message is only being delivered once. The process only delivers the message if it
 has not already been delivered. Therefore no duplicates exists in this solution. If a process dies another node will flood
 the message to the rest working processes.
 % What will happen when a process crash?
@@ -131,7 +132,7 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
   is sent, it has to be passed to the sequencer, get a sequence 
   number, and then it is delivered back by a broadcast. When it 
   is received it is not delivered, it has to be put to a queue 
-  untill the message with the next sequence number if found. 
+  until the message with the next sequence number if found. 
   Hence there is only one node that is allowed to set sequence 
   numbers, and the  sequence numbers is unique, all the nodes 
   will get a message with a sequence number.
@@ -141,7 +142,7 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
   Assume towards contradiction there can exist a message sequence
   that breaks causal order, then a process $P$ has to received a message $m_1$
   after that send a message $m_2$, this causes $m_1$ and $m_2$ to be causally
-  related. To break the causal order, message $m_2$ has to be percieved before $m_1$, 
+  related. To break the causal order, message $m_2$ has to be perceived before $m_1$, 
   but this is a contradiction hence message $m_1$ has to have a sequence number when 
   it is received by $P$ and $m_2$ will get a higher sequence number when it is sent 
   to the sequencer, and the nodes deliver the messages according to the sequence numbers.
@@ -149,7 +150,7 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
   Fault tolerance in failing nodes is already described in section \ref{reliability}.
   An important notice that is not to be forgotten is the sequencer. If the sequencer 
   dies, a new sequencer has to be elected and integrity, validity and agreement will 
-  still be preserved aswell as ordering.
+  still be preserved as well as ordering.
   \subsection{Integrity}
     When a node is sending a message, one and only one, is created and then put in a queue.
     the message together with an unique id specific for that processor. When the message then is 
@@ -172,24 +173,24 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
     messages to all other nodes to be updated, no one will be without a notion of the new leader
 
   \subsection{Ordering}
-    If the sequencer dies, then the nodes will buffer their messages untill it is received. 
-    All theise messages will then be concurrent if the sequencer is dead, hence no one can 
-    deliver a message untill a new sequencer is elected, and no need for flooding or special
+    If the sequencer dies, then the nodes will buffer their messages until it is received. 
+    All these messages will then be concurrent if the sequencer is dead, hence no one can 
+    deliver a message until a new sequencer is elected, and no need for flooding or special
     ordering is needed. When the new sequencer is found the nodes just have to send their messages as soon
     as possible, but before anything else, to the sequencer. Hence causal order will be preserved, no one
-    can recieve messages while the sequencer is dead and they will be causally concurrent. The new sequencer
+    can receive messages while the sequencer is dead and they will be causally concurrent. The new sequencer
     will set sequencer numbers and broadcast the message exactly as before so total order is also preserved
     hence it is buffered in each node and then delivered according to sequence numbers.
     
 \section{Conclusion}
   The solution might seem crude at a beginning, but the fact is that the message complexity
   is rather good in this solution.To broadcast a message, one message is sent to the sequencer and then N 
-  messages is sent to each node, where N is the number of nodes in the group, as opposed to a aproach
+  messages is sent to each node, where N is the number of nodes in the group, as opposed to an approach
   where each node has to agree on a sequence before the message is sent. This generates order of N messages
   even before the message is sent, then the message has to be broadcasted, making the message complexity
-  being atleast double. Although, one have to keep in mind that our solution sends a whole message
-  to the sequencer, and the agreement aproach just has to agree on sequence, which can be done with
-  small messages. The bad thing is that it sends alot of data through the sequencer and the node 
+  being at least double. Although, one have to keep in mind that our solution sends a whole message
+  to the sequencer, and the agreement approach just has to agree on sequence, which can be done with
+  small messages. The bad thing is that it sends a lot of data through the sequencer and the node 
   that acts as a sequencer might be overloaded with messages, and if it dies no one will be able 
-  to send any messages untill the new one is elected.
+  to send any messages until the new one is elected.
 \end{document}
