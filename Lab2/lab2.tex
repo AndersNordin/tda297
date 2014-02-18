@@ -19,12 +19,12 @@
 \newpage
 
 \section{Introduction}
-  This report describes some of the problems of distributed network and how to maintain total order 
+  This report describes a protocol on how to maintain total order 
   as well as causal order in a system that has reliable unicast FIFO order messaging.\\
-  In this solution a single node is elected as a sequencer and all messages is sent through
-  the sequencer and it will then singlehandedly add sequence numbers and then multicast it
+  In this protocol a single node is elected as a sequencer and all messages is sent through
+  the sequencer and it will then singlehandedly add sequence numbers and then broadcast it
   to all other nodes.
-  The report will start with a short description of the system and what algorithms used. §
+  The report will start with a short description of the system and what algorithms used. 
   Then reliability is discussed and how the system solve integrity, validity and agreement.
   After that an explanation of how the system holds for total and causal order. Then there 
   is an explanation of how the system handle crashing processes. Lastly there is a conclusion.
@@ -32,7 +32,11 @@
 \section{Description of the system}
  The system consists of N processes that communicate with each other by TCP channels.
  TCP channels gives the system reliable unicast with FIFO order. Upon this system a
- reliable total and causal order multicast is implemented. 
+ reliable total and causal order broadcast is implemented. 
+ In order to handle crashing nodes, flooding is used. When a process receive a message
+ it is then sent to the other processes. 
+ In order to handle order a single process called sequencer is used which handle all
+ ordering of messages.
  \subsection{Sequencer}
  \label{sequencer}
  In this system there exists a single node that is also a sequencer. All messages will 
@@ -69,7 +73,7 @@
       \draw (5.2,2)[o-stealth,anchor=south west,sloped] -- 
           node {\{flood\}} (7,0);
     \end{tikzpicture}
-    \caption{Example of a message being multicasted}
+    \caption{Example of a message being broadcasted}
     \label{fig1}
   \end{figure}
   
@@ -82,7 +86,7 @@
   \item No partitioning in the network
   \end{itemize}  
 
-\section{Reliability} is 
+\section{Reliability} 
   \label{reliability}
   %Short description here, proofs in subsections!
   The reliability is provided by flooding the message. By the assumptions made in \ref{assumption} we can rely on 
@@ -126,7 +130,7 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
   No one else is allowed to set a sequence numbers. If a message 
   is sent, it has to be passed to the sequencer, get a sequence 
   number, and then it is delivered back by a broadcast. When it 
-  is recieved it is not delivered, it has to be put to a queue 
+  is received it is not delivered, it has to be put to a queue 
   untill the message with the next sequence number if found. 
   Hence there is only one node that is allowed to set sequence 
   numbers, and the  sequence numbers is unique, all the nodes 
@@ -135,13 +139,12 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
 \subsection{Causal order}
   %Each message has to be sent by one single process S in the group g.
   Assume towards contradiction there can exist a message sequence
-  that breaks causal order, then a process $P$ has to recieve a message $m_1$
-  after that send a message $m_2$ this causes $m_1$ and $m_2$ to be causally
-  related, to break the causal order, message $m_2$ has to be percieved by all
-  nodes before $m_1$, but this is a contradiction hence message $m_1$ has to have
-  a sequence number when it is recieved by $P$ and $m_2$ will get a higher sequence
-  number when it is sent to the sequencer, and the nodes deliver the messages according
-  to the sequence numbers.
+  that breaks causal order, then a process $P$ has to received a message $m_1$
+  after that send a message $m_2$, this causes $m_1$ and $m_2$ to be causally
+  related. To break the causal order, message $m_2$ has to be percieved before $m_1$, 
+  but this is a contradiction hence message $m_1$ has to have a sequence number when 
+  it is received by $P$ and $m_2$ will get a higher sequence number when it is sent 
+  to the sequencer, and the nodes deliver the messages according to the sequence numbers.
 \section{Fault tolerance}
   Fault tolerance in failing nodes is already described in section \ref{reliability}.
   An important notice that is not to be forgotten is the sequencer. If the sequencer 
@@ -160,7 +163,7 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
     sequencer is elected. The elected node will then send a message to the other nodes updating them
     about a new sequencer is elected, and it is to this nodes the following messages should be sent.
     The nodes will then send the messages it was unable to send to the previous sequencer to the
-    new sequencer, and they will then be multicasted and removed from the buffer to inform the nodes
+    new sequencer, and they will then be broadcasted and removed from the buffer to inform the nodes
     that the message is infact broadcasted.
 
   \subsection{Agreement}
@@ -175,7 +178,7 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
     ordering is needed. When the new sequencer is found the nodes just have to send their messages as soon
     as possible, but before anything else, to the sequencer. Hence causal order will be preserved, no one
     can recieve messages while the sequencer is dead and they will be causally concurrent. The new sequencer
-    will set sequencer numbers and multicast the message exactly as before so total order is also preserved
+    will set sequencer numbers and broadcast the message exactly as before so total order is also preserved
     hence it is buffered in each node and then delivered according to sequence numbers.
     
 \section{Conclusion}
@@ -183,7 +186,7 @@ messages that have been broadcasted by a correct process, a process $P_(n+1)$ al
   is rather good in this solution.To broadcast a message, one message is sent to the sequencer and then N 
   messages is sent to each node, where N is the number of nodes in the group, as opposed to a aproach
   where each node has to agree on a sequence before the message is sent. This generates order of N messages
-  even before the message is sent, then the message has to be multicasted, making the message complexity
+  even before the message is sent, then the message has to be broadcasted, making the message complexity
   being atleast double. Although, one have to keep in mind that our solution sends a whole message
   to the sequencer, and the agreement aproach just has to agree on sequence, which can be done with
   small messages. The bad thing is that it sends alot of data through the sequencer and the node 
