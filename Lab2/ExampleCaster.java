@@ -7,7 +7,6 @@ import mcgui.*;
  * @author Andreas Larsson &lt;larandr@chalmers.se&gt;
  */
 public class ExampleCaster extends Multicaster {
-    private LinkedList<Integer> waiting;
     private int leader;
     private boolean hasLeader;
     private int[] alive;
@@ -15,21 +14,19 @@ public class ExampleCaster extends Multicaster {
     private int lastAck = -1;
     private LinkedList<ExampleMessage> receiveBuffer;
     private LinkedList<MessageText> sendBuffer;
-    private int debugTester = 0;
+    private int aliveHosts = 0;
     private int messageId;
 
     /*
     * Runs when the programs starts.
     */
     public void init() {
-
       // Number of hosts that are alive. 1 if alive and 0 if dead.
       alive = new int[hosts];
       for(int i = 0; i<hosts;i++){
         alive[i] = 1;
       }
 
-      waiting = new LinkedList<Integer>();
       sendBuffer = new LinkedList<MessageText>();
       receiveBuffer = new LinkedList<ExampleMessage>();
       mcui.debug("The network has "+hosts+" hosts!");
@@ -46,40 +43,16 @@ public class ExampleCaster extends Multicaster {
     public void cast(String messagetext) {
       MessageText msg = new MessageText(messageId++,messagetext);
       sendBuffer.add(msg);
-      if(hasLeader){
-        askForTicket(msg);
-      }else{
-        mcui.debug("Adding to sendBuffer");
-      }
+      askForTicket(msg);
     }
-    public boolean allPresent(){
+    public int getAliveHosts(){
+      int r=0;
       for(int i = 0;i<hosts;i++){
-        if(alive[i] == 1 && i != id){
-          if(!waiting.contains(i)){
-            return false;
-          }
+        if(alive[i] == 1){
+          r++;
         }
       }
-      mcui.debug("everybody is here!");
-      return true;
-    }
-
-    public void sendLeader(){
-      mcui.debug("Sending leader to everyone!");
-      if( leader == id ){
-        for ( int i = 0;i<hosts;i++){
-          if(alive[i] == 1 && i != leader ){
-            mcui.debug("Sending to: "+i);
-            bcom.basicsend(i,new LeaderMessage(id,id));
-          }
-        }
-        if(sendBuffer.size() != 0){
-          for(MessageText s : sendBuffer){
-            askForTicket(s);
-          }
-        }
-      }
-      waiting.clear();
+      return r;
     }
 
     /**
@@ -87,44 +60,36 @@ public class ExampleCaster extends Multicaster {
      * @param message  The message received
      */
     public void basicreceive(int peer,Message message) {
-
       if(message instanceof LeaderMessage){
         LeaderMessage lmsg = (LeaderMessage)message;
-        mcui.debug("lmsg.leader: "+lmsg.getLeader()+" from: "+peer);
-        waiting.add(peer);
-        if(id == leader){
-          if(allPresent()){
-            sendLeader();
-          }
-        }else{
-          leader = lmsg.getLeader();
-          seqNr++;
-          mcui.debug("Send all data to leader!");
-          if(sendBuffer.size() != 0){
-            for(MessageText s : sendBuffer){
-              askForTicket(s);
+        //leader =  lmsg.getLeader();
+        if(lmsg.getLeader() == -1){
+          aliveHosts++;
+          if(aliveHosts == getAliveHosts()){
+            aliveHosts = 0;
+            mcui.debug("Leader is elected and all nodes agree");
+            for ( int i = 0;i<hosts;i++){
+              if(alive[i] == 1){
+                bcom.basicsend(i,new LeaderMessage(id,id));
+              }
             }
           }
-        }
-       
-      /*
-        LeaderMessage lmsg = (LeaderMessage)message;
-        leader =  lmsg.getLeader();
-        mcui.debug("Leader is: "+leader);
-        if(sendBuffer.size() != 0){
+          
+        }else{
+          leader =  lmsg.getLeader();
           for(MessageText s : sendBuffer){
             askForTicket(s);
           }
         }
-      */
+
       }else if(message instanceof Ticket){
+        //mcui.debug("leader: "+leader+" peer: "+peer);
         Ticket ticket = (Ticket)message;
         handleTicket(peer,ticket);
-
       // A normal message is received
       }else if (message instanceof ExampleMessage){
         ExampleMessage msg = (ExampleMessage)message;
-        mcui.debug("sendBuffer: "+sendBuffer.size());
+        //mcui.debug("sendBuffer: "+sendBuffer.size());
         int seq = msg.getSeqNr();
         if(msg.getFlood()){
           flood(msg,peer);
@@ -139,7 +104,7 @@ public class ExampleCaster extends Multicaster {
             if(id != leader) {
               seqNr = msg.getSeqNr()+1;
             }
-            mcui.deliver(msg.getSender(), msg.getText()+" : "+msg.getSeqNr());    
+            mcui.deliver(msg.getSender(), msg.getText());    
             tryBuffer();
           }else{
             receiveBuffer.add(msg);
@@ -168,7 +133,6 @@ public class ExampleCaster extends Multicaster {
         }
       }
     }
-
     /*
     * Can the message be delivered or are we waiting for another message to arrive.
     */
@@ -179,19 +143,18 @@ public class ExampleCaster extends Multicaster {
       }
       return false;
     }
-
     /*
     * Checking the buffer to see if we can deliver any messages
     */
     private void tryBuffer(){
       for(ExampleMessage msg : receiveBuffer) {
         if(lastAck+1 == msg.getSeqNr()){
-          mcui.debug("Deliver and set sequence num to " + msg.getSeqNr());
+          //mcui.debug("Deliver and set sequence num to " + msg.getSeqNr());
           seqNr = msg.getSeqNr()+1;
           if(msg.getRecipient()==id){
             sendBuffer.remove();
           }
-          mcui.deliver(msg.getSender(), msg.getText()+": "+msg.getSeqNr());    
+          mcui.deliver(msg.getSender(), msg.getText());    
           receiveBuffer.remove(msg);
           lastAck++;
           tryBuffer();
@@ -201,11 +164,11 @@ public class ExampleCaster extends Multicaster {
       //Nothing found
       return;
     }
-
     /*
     * The leader creates a ticket.
     */
     private void handleTicket(int peer, Ticket ticket) {
+      //mcui.debug("leader: "+leader+" peer: "+peer);
       if(ticket.getSeqNr() == null) {
         if(leader == id){
           ticket.setSeqNr(seqNr++);
@@ -215,7 +178,6 @@ public class ExampleCaster extends Multicaster {
         mcui.debug("Something weird happened, only leader is supposed to do stuff!");
       }
     }
-
     /**
      * Signals that a peer is down and has been down for a while to
      * allow for messages taking different paths from this peer to
@@ -223,20 +185,15 @@ public class ExampleCaster extends Multicaster {
      * @param peer  The dead peer
      */
     public void basicpeerdown(int peer) {
-        mcui.debug("Peer "+peer+" has been dead for a while now!");
-        alive[peer]=0;
-        if(peer == leader) {
-          mcui.debug("The leader is dead, lets elect a new leader.");
-          leader = leaderElection(id);
-          mcui.debug("New leader is: "+ leader);
-        }
-        if( leader != id ) {
-          bcom.basicsend(leader,new LeaderMessage(id,leader));
-        } else if(leader == id && allPresent() ){
-          sendLeader(); 
-        }
+      mcui.debug("Peer "+peer+" has been dead for a while now!");
+      alive[peer]=0;
+      if(peer == leader) {
+        mcui.debug("The leader is dead, lets elect a new leader.");
+        int newleader = leaderElection(id);
+        mcui.debug("New leader is: "+ leader);
+        bcom.basicsend(newleader,new LeaderMessage(id,-1));
+      }
     }
-
     /*
     * Sending newMessage to everyone except itself.
     */
@@ -254,27 +211,19 @@ public class ExampleCaster extends Multicaster {
           if(msg.getRecipient()==id){
             sendBuffer.remove();
           }
-          mcui.deliver(msg.getSender(), msg.getText()+" : "+msg.getSeqNr());    
-          mcui.debug("SendBuffer: "+sendBuffer.size());
+          mcui.deliver(msg.getSender(), msg.getText());    
+          //mcui.debug("SendBuffer: "+sendBuffer.size());
           tryBuffer();
         }else{
           receiveBuffer.add(msg);
         }
     }
-
-    private void multicastFromBuffer() {
-      for(MessageText msg : sendBuffer) {
-        mcui.debug("Sending from sendBuffer: "+msg.getMsg());
-        cast(msg.getMsg());
-      }
-    }
-
     /*
     * Elect the next host which is alive and return id.
     * If all are dead return -1.
     */
     private int leaderElection(int proposedLeader){
-      for(int i = 0; i < alive.length;i++){
+      for(int i = 0; i < hosts ; i++){
         if(alive[i] == 1) {
           return i;
         }
@@ -283,7 +232,9 @@ public class ExampleCaster extends Multicaster {
     }
 
     private void askForTicket(MessageText message){
-      mcui.debug("Asking for ticket");
+      if(leader == 1){
+        //mcui.debug("Asking for ticket "+message.getMsg());
+      }
       bcom.basicsend(leader,new Ticket(id,message));
     }
 }
