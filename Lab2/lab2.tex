@@ -19,21 +19,33 @@
 \newpage
 
 \section{Introduction}
-  This report describes some of the problems of distributed network and how to maintain total order as well as causal order in a system that has reliable unicast FIFO order messaging.\\
-  The report will start with a short description of the system and what algorithms used. Then reliability is discussed and how the system solve integrity, validity and agreement. After that an explanation of how the system holds for total and causal order. Then there is an explanation of how the system handle crashing processes. Lastly there is a conclusion.
+  This report describes some of the problems of distributed network and how to maintain total order 
+  as well as causal order in a system that has reliable unicast FIFO order messaging.\\
+  The report will start with a short description of the system and what algorithms used. 
+  Then reliability is discussed and how the system solve integrity, validity and agreement.
+  After that an explanation of how the system holds for total and causal order. Then there 
+  is an explanation of how the system handle crashing processes. Lastly there is a conclusion.
 
 \section{Description of the system}
  The system consists of N processes that communicate with each other by TCP channels.
  TCP channels gives the system reliable unicast with FIFO order. Upon this system a
- reliable total order and causal order multicast is implemented. In this system there
- exists a single node that is also a sequencer. All messages will pass through the sequencer
- and the sequencer will then add a sequence number to that message, and then distribute it to
- all nodes. The nodes will then receive the message and then start flooding it to all other nodes.
- These events is described by Figure \ref{fig1}. An important thing to note in the figure is that
- the sequencer is described as an independent node. This is for simplification, in reality the sequencer
- is kept within a node. \\
- In order to then create the correct order, the messages is not delivered to the node directly when
+ reliable total order and causal order multicast is implemented. 
+ \subsection{Sequencer}
+ In this system there exists a single node that is also a sequencer. All messages will 
+ pass through the sequencer and the sequencer will then add a sequence number to that 
+ message, and then distribute it to all nodes. The nodes will then receive the message 
+ and then start flooding it to all other nodes. These events is described by Figure 
+ \ref{fig1}. An important thing to note in the figure is that the sequencer is described 
+ as an independent node. This is for simplification, in reality the sequencer is kept 
+ within a node. \\
+ \subsection{Nodes}
+ The normal nodes will send its message to the sequencer, get it back with a sequence number.
+ In order to then create the correct order, the messages is not delivered directly when
  it is received, but is instead put in a queue until the correct sequence number is acquired.\\
+ \subsection{Example}
+ Example of two functioning nodes with a sequencer. The message sent tot he sequencer is 
+ represented by a wavy arrow, and the messages with a sequence number is represented by normal
+ arrows.
   \begin{figure}[h]
     \centering
     \begin{tikzpicture}
