@@ -1,11 +1,6 @@
 import java.util.*;
 import mcgui.*;
 
-/**
- * Simple example of how to use the Multicaster interface.
- *
- * @author Andreas Larsson &lt;larandr@chalmers.se&gt;
- */
 public class ExampleCaster extends Multicaster {
     private int leader;
     private boolean hasLeader;

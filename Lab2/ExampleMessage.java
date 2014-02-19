@@ -1,10 +1,5 @@
 import mcgui.*;
 
-/**
- * Message implementation for ExampleCaster.
- *
- * @author Andreas Larsson &lt;larandr@chalmers.se&gt;
- */
 public class ExampleMessage extends Message {
         
     private String text;  
