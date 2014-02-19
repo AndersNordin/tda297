@@ -47,6 +47,16 @@
  \ref{fig1}. An important thing to note in the figure is that the sequencer is described 
  as an independent node. This is for simplification, in reality the sequencer is kept 
  within a node. \\
+ \subsubsection{Electing a new sequencer}
+ If a sequencer crashes, a new must be elected in order for the nodes to be able to send
+ messages. This is done by all nodes first finding out the next best candidate. Then sending
+ a message containing a proposal of -1 as a leader to that node. That node recognizes this,
+ and keeps track on how many that has sent proposals to him. When all nodes has sent a proposal
+ to the new sequencer, the sequencer then sends a message containing him as leader proposal, 
+ and they will then elect him as leader. This is done to make sure that all messages is sent 
+ before any new sequencer is elected. If a message is pending, it has to arrive before the 
+ proposal sent to the new sequencer. Hence FIFO-ordering unicast, when the new sequencer is 
+ elected it can be sure that the view is the same on all nodes.
  \subsection{Nodes}
  The normal nodes will send its message to the sequencer, get it back with a sequence number.
  In order to then create the correct order, the messages is not delivered directly when
