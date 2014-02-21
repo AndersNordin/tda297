@@ -3,7 +3,6 @@ import mcgui.*;
 
 public class ExampleCaster extends Multicaster {
     private int leader;
-    private boolean hasLeader;
     private int[] alive;
     private static int seqNr;
     private int lastAck = -1;
@@ -24,11 +23,9 @@ public class ExampleCaster extends Multicaster {
 
       sendBuffer = new LinkedList<MessageText>();
       receiveBuffer = new LinkedList<ExampleMessage>();
-      mcui.debug("The network has "+hosts+" hosts!");
       seqNr = 0;
       leader = 0;
       messageId = 0;
-      hasLeader = true;
     }
 
     /**
@@ -78,13 +75,11 @@ public class ExampleCaster extends Multicaster {
         }
 
       }else if(message instanceof Ticket){
-        //mcui.debug("leader: "+leader+" peer: "+peer);
         Ticket ticket = (Ticket)message;
         handleTicket(peer,ticket);
       // A normal message is received
       }else if (message instanceof ExampleMessage){
         ExampleMessage msg = (ExampleMessage)message;
-        //mcui.debug("sendBuffer: "+sendBuffer.size());
         int seq = msg.getSeqNr();
         if(msg.getFlood()){
           flood(msg,peer);
@@ -144,7 +139,6 @@ public class ExampleCaster extends Multicaster {
     private void tryBuffer(){
       for(ExampleMessage msg : receiveBuffer) {
         if(lastAck+1 == msg.getSeqNr()){
-          //mcui.debug("Deliver and set sequence num to " + msg.getSeqNr());
           seqNr = msg.getSeqNr()+1;
           if(msg.getRecipient()==id){
             sendBuffer.remove();
@@ -160,10 +154,9 @@ public class ExampleCaster extends Multicaster {
       return;
     }
     /*
-    * The leader creates a ticket.
+    * The leader populates a ticket with a sequencenumber.
     */
     private void handleTicket(int peer, Ticket ticket) {
-      //mcui.debug("leader: "+leader+" peer: "+peer);
       if(ticket.getSeqNr() == null) {
         if(leader == id){
           ticket.setSeqNr(seqNr++);
@@ -190,7 +183,7 @@ public class ExampleCaster extends Multicaster {
       }
     }
     /*
-    * Sending newMessage to everyone except itself.
+    * Sending newMessage to everyone.
     */
     private void multicastMessage(Ticket ticket,String newMessage){
         ExampleMessage msg = new ExampleMessage(id, newMessage,ticket);
@@ -207,7 +200,6 @@ public class ExampleCaster extends Multicaster {
             sendBuffer.remove();
           }
           mcui.deliver(msg.getSender(), msg.getText());    
-          //mcui.debug("SendBuffer: "+sendBuffer.size());
           tryBuffer();
         }else{
           receiveBuffer.add(msg);
@@ -228,7 +220,6 @@ public class ExampleCaster extends Multicaster {
 
     private void askForTicket(MessageText message){
       if(leader == 1){
-        //mcui.debug("Asking for ticket "+message.getMsg());
       }
       bcom.basicsend(leader,new Ticket(id,message));
     }
