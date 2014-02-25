@@ -1,6 +1,7 @@
 
+
 \documentclass{article}
-\title{TDA297 Laboration 2}
+\title{Paper review of Finding a needle in Haystack: Facebook's photo storage}
 \author{anordin@student.chalmers.se\quad Anders Nordin\\
         viklin@student.chalmers.se\quad Viktor Lindstr\"{o}m}
 \date{\today}
@@ -29,13 +30,20 @@
 \section{Introduction}
 Facebook is a relatively new company and has grown really much the last couple of years and is today a part of most peoples everyday life. The large number of users that share and upload files every hour consumes tons of data that must be stored and available for the users to interact with. 
 
-This report is based on the paper "Finding a needle in Haystack: Facebook's photo storage" which deals with the problem of all photos on Facebook. To cite the authors in the paper: "Facebook currently stores over 260 billion images, which translates to over 20 petabytes of data. Users upload one billion new photos(~ 60 terabyte) each week and Facebook serves over one million images per  second at peak." 
+This report is based on the paper "Finding a needle in Haystack: Facebook's photo storage" which deals with the problem of all photos on Facebook. To cite the authors in the paper: "Facebook currently stores over 260 billion images, which translates to over 20 petabytes of data. Users upload one billion new photos(about 60 terabyte) each week and Facebook serves over one million images per second at peak." 
 
 The writers of this reports reads the Advanced course of Distributed Systems at Chalmers University in Gothenburg. With our current knowledge in the area we will review the paper and explain the solution together with our criticism.
 
 \inlinetodo{Done?}
  
 \section{Background}
+Photo files are characterized by how the users tend to access them, they belong to the group of data that is typically writtens once, read often, never modified and rarely deleted.
+ 
+
+The authors of the paper find that a classic POSIX based filesystem use to much space for metadata, things like file permission is not used at all. Also the metadeta has to be read from disk into memory to find the actual file.
+
+
+
 \inlinetodo{
 - What is the problems with the previous system? \\
 - Why the need for a new system? \\
@@ -47,6 +55,14 @@ The writers of this reports reads the Advanced course of Distributed Systems at 
 \section{Haystack}
 \inlinetodo{Explain the system. What is achieved and so on..}
 
+\subsection{Goals}
+The haystack is designed to achieve four main goals:
+\begin{itemize}
+  \item High throughput and low latency
+  \item Fault-tolerant
+  \item Cost-effective
+  \item Simple
+\end{itemize} 
 
 \section{Discussion}
 \inlinetodo{What are our thoughts about it? Good/Bad?}
