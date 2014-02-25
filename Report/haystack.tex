@@ -1,34 +1,42 @@
-\section{Haystack}
-  Three parts combined makes they Haystack system, it is the 
-  Haystack Directory, Haystack Store and the Haystack Cache.
-  Each one of them serving its own pupose. The Directory allowing for
-  simplifications when finding the image on the actual servers containing the
-  image. That server part is the Haystack Store, it contains the actual data, and
-  allows for reading, writing and deleting. The cache is a cusomized cache so that
-  it is very fast to find files that is newly uploaded.
-  
-\inlinetodo{10 steps makes a picture, from a users perspective}
-\subsection{Haystack Directory}
+\section{Design and Implementation}
+ Three parts are combined to make the Haystack system, it is
+ Haystack Directory, Haystack Store and Haystack Cache.
+ Each one of them serving its own purpose. The Directory allowing for
+ simplifications when finding the image on the actual servers containing the
+ image. That server part is the Haystack Store, it contains the actual data, and
+ allows for reading, writing and deleting. The cache is a customized cache so that
+ it is very fast to find files that is newly uploaded.
+
+\subsection{Haystack}
+The haystack is designed to achieve four main goals:
+\begin{itemize}
+  \item High throughput and low latency
+  \item Fault-tolerant
+  \item Cost-effective
+  \item Simple
+\end{itemize} 
+
+\subsubsection{Haystack Directory}
   What the Haystack Directory provides is mappings between physical and logical
   volumes, this mapping is then used when constructing a url for image request.
-  The Directory can also determines if the request handled by CDN or by the 
+  The Directory can also determine if the request is handled by CDN or by the 
   Haystack Cache directly. 
-  \inlinetodo{the directory also handles loadbalancing and discs that are full}
-\subsection{Haystack Store}
-  The Haystack Store maintains persistant storage for images. On request it returns
-  either the photo, or an error if file not found. \\
-  An datastructure of maps between keys and images are kept in-memory to retrieve
-  the images as fast as possible. The datastructure includes data such as offset,
-  size ,flags, a cookie with a random number,  aswell as the corresponding key.  
-  Haystack Store allowes for three operations: read, write and delete.\\
-  To read a picture from the Store the key is read, file is thereby found by the mappings
-  and the cookies random number is checked aswell as the integrity of the file, and then
-  returned. To write a picture to the Haystack Store, the Haystack webservers will provide
-  necessary values for the mappings and then append it to the disk.
-  Delete is simple, just set flag to notify that the file is deleted, and the delete
-  is handled later.
   
-\subsection{Haystack Cache}
+\subsubsection{Haystack Store}
+ The Haystack Store maintains persistent storage for images. On request it returns
+ either the photo or an error if the file not found. \\
+ A data structure of maps between keys and images are kept in-memory to retrieve
+ the images as fast as possible. The data structure includes data such as offset,
+ size ,flags, a cookie with a random number, as well as the corresponding key. 
+ Haystack Store allows for three operations: read, write and delete.\\
+ To read a picture from the Store the key is read, file is thereby found by the mappings
+ and the cookies random number is checked as well as the integrity of the file, and then
+ returned. To write a picture to the Haystack Store, the Haystack web servers will provide
+ necessary values for the mappings and then append it to the disk.
+ Delete is simple, just set flag to notify that the file is deleted, and the delete
+ is handled later.
+  
+\subsubsection{Haystack Cache}
   The cache is organized as a distributed hash table, and the photo id is used as key.
   If it is found in cache it will respond to either CDN or user, depending on who made
   the request. A request from CDN will not be cached, and neither will a request from a
@@ -37,5 +45,3 @@
   else. Also, if a request is coming from a full Store machine, because it has been proven
   that the most heavily accessed photos is they who were just uploaded, hence from a write 
   enabled Store.
- 
-
