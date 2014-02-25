@@ -1,14 +1,35 @@
 \section{Background}
-Photo files are characterized by how the users tend to access them, they belong to the group of data that is typically writtens once, read often, never modified and rarely deleted.
+Photo files are characterized by how the users tend to access them, they belong 
+to the group of data that is typically writtens once, read often, never modified 
+and rarely deleted.
  
+%Old system
+The previous system used a combination of NFS and CDN. The CDN provided a cache of  
+the most common pictures and the NFS filesystem provided them with a proven and
+a easy to maintain filesystem. When the system started to grow they saw problems
+with scalability, one of them being that the most popular pictures might not even be 
+interesting for most of the users. They found that it was more dependent of the time 
+the file had existed rather than how many that as seen the file. An other problem with
+the system was that in order to fetch data alot of unnecessary information was stored 
+and in order to find a single image alot of I/O operations was needed.\\
 
-The authors of the paper find that a classic POSIX based filesystem use to much space for metadata, things like file permission is not used at all. Also the metadeta has to be read from disk into memory to find the actual file.
+The new system they wanted should have High throughput and low latancy, be fault-tolerant,
+cost-effective and it should simple.
 
+%The authors of the paper find that a classic POSIX based filesystem use to much 
+%space for metadata, things like file permission is not used at all. Also the 
+%metadeta has to be read from disk into memory to find the actual file.
+% Kombinera dessa två texter.... Vart står det POSIX based filesystem? Ska vi ha de
+% eller NFS? NFS är tydligare tycker jag, posix kan vara lite vad som helst
+
+%Facebook found that the use of NFS based system generated alot of metadata just
+%to retrieve a file, that then generated alot of I/O operations. Sometimes up to 10
+%I/O operations just to read a single image.
 
 
 \inlinetodo{
-- What is the problems with the previous system? \\
-- Why the need for a new system? \\
-- What is typicall with photo upload? \\
+-X What is the problems with the previous system? \\
+-X Why the need for a new system? \\
+-\ What is typicall with photo upload? \\
 - More ? \\
 }
