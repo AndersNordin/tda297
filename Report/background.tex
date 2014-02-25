@@ -12,9 +12,14 @@ interesting for most of the users. They found that it was more dependent of the 
 the file had existed rather than how many that as seen the file. An other problem with
 the system was that in order to fetch data alot of unnecessary information was stored 
 and in order to find a single image alot of I/O operations was needed.\\
-
-The new system they wanted should have High throughput and low latancy, be fault-tolerant,
-cost-effective and it should simple.
+\subsection{Goals}
+The haystack is designed to achieve four main goals:
+\begin{itemize}
+  \item High throughput and low latency
+  \item Fault-tolerant
+  \item Cost-effective
+  \item Simple
+\end{itemize} 
 
 %The authors of the paper find that a classic POSIX based filesystem use to much 
 %space for metadata, things like file permission is not used at all. Also the 
@@ -33,3 +38,4 @@ cost-effective and it should simple.
 -\ What is typicall with photo upload? \\
 - More ? \\
 }
+

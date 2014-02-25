@@ -1,5 +1,9 @@
 \section{Discussion}
 \subsection{Fault-tolerance}
-They talk about fault-tolerance, but not much about how to solve faulty messages.
-When 
+They talk about fault-tolerance, but not much about how to solve faulty messages, mostly
+about faulty drives. It is assumed that everything is working, and a system named pitchfork
+is proactivly checking for failures. An other aproach could be to build a system where this
+is not needed. It is a way to make sure that messages are not sent to faulty entities. 
+
+\inlinetodo{Possibility to recreate in-memory maps on store}
 \inlinetodo{What are our thoughts about it? Good/Bad?}
