@@ -1,22 +1,23 @@
 \section{Discussion}
-The system can be simplified to a sequencer with a number of storagenodes.
+The system can be simplified to resemble a sequencer connected to a number of storage nodes.
 The sequencer beging the Haystack Directory makes sure the requests get the 
-proper id, and the correct node get the correct information. 
+proper id, and the user gets the correct information for their image. When the user
+is fetching the actual data from the Storage node,it uses the id from the sequencer
+to find the demanded information. With this simplification in mind, we can reason about how it
+functions.
 \subsection{Fault-tolerance}
-They talk about fault-tolerance, but not much about how to solve faulty messages, mostly
-about faulty drives. It is assumed that everything is working, and a system named pitchfork
-is proactivly checking for failures. An other aproach could be to build a system where this
-is not needed. It is a way to make sure that messages are not sent to faulty entities. 
-
-An alternate solution would be to try to find or mask errors by using voting. 
+They talk about fault-tolerance, but not much about how to solve faulty messages, they talk
+ mostly about faulty drives. It is assumed at all time, that everything is working, and a system 
+named pitchfork is proactivly checking for failures. An alternate solution would be to 
+try to find or mask errors by introducing voting.
 
 Replication across servers is not mensioned in the paper, only RAID 6. It is probable that
-they have multiple replicas to adress performance issues when server is located
-long physical distances from users. In the paper is mension that the Haystack Store 
-has a system for loadbalancing which is indicating that they store on muliple servers
-at once. Although, it might be a good idea to not replicate to much, hence it is uploaded
-~60TB weekly. That means hughly costs just to have the RAID 6 repliciation to handle
-individual disc failures. 
+they have multiple replicas to address performance issues when server is located
+long physical distances from users. In the paper is mensioned that the Haystack Store 
+has a system for loadbalancing which is indicating that they store the same on muliple servers. 
+Although, it might be a good idea to not replicate too much, hence it is uploaded
+\~60TB weekly. That means hughly costs just to have the RAID 6 repliciation to handle
+individual disc failures.
 
 
 \inlinetodo{Possibility to recreate in-memory maps on store}
