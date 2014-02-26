@@ -1,0 +1,108 @@
+
+
+\documentclass{article}
+\title{Lab3}
+\author{anordin@student.chalmers.se\quad Anders Nordin\\
+        viklin@student.chalmers.se\quad Viktor Lindstr\"{o}m}
+\date{\today}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{verbatim}
+\usepackage{enumerate}
+\usepackage{steinmetz}%för att få tillgång till /phase
+\usepackage{amsmath}%massa trevliga symboler
+\usepackage{siunitx}%enklare notation på enheter
+\usepackage{tikz}
+\usepackage{newclude}
+\usepackage{setspace}
+\usepackage{todonotes}
+\usepackage{titlesec}
+\newcommand{\inlinetodo}[2][]{\todo[caption={#2},inline,#1]{#2}}
+\newcommand{\checknote}[2][]{\todo[caption={#2},size=\small,color=yellow!40,#1]{\begin{spacing}{0.5}#2\end{spacing}}}
+
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,positioning,fit,petri}
+\usepackage{fullpage}
+\begin{document}
+\maketitle
+\newpage
+
+\section{Introduction}
+  This report will discuss and try to find a good solution in finding a 
+  good way to route a message through a sensor-network.
+  First a given basic solution will be given, after that
+  we will present our findings. Each solution is given with first
+  a breif description of how the algorithm find the route. Then 
+  result of the solution is given by five runs of two given topologies,
+  Grid and Comb. Grid topology is a totaly symetric grid, 4 * 10 nodes.
+  the Comb is the same as the previous grid, but with the exception of
+  a couple of nodes taken out, making it a rather asymetric graph.
+\section{Basic solution}
+  The given program creates its route by the following algorithm.
+  During anouncement phase, if the node has not already chosen an 
+  node to route its messages through and if it is shorter
+  from that node to the sink, use that node as next node.
+  \subsection{Result}
+    \begin{tabular}{c|c}
+      Grid topology & Comb topology\\
+      \hline
+      \hline
+      161 & 112\\
+      169 & 103\\
+      141 & 91\\
+      159 & 118\\
+      146 & 112\\
+    \end{tabular}
+
+  \subsection{Problem}
+    One of the problem is that it just choses the first one,
+    so result will vary between each execution.
+    If unlucky the nodes with distance MAXDISTANCE from
+    sinknode will send its messages all the way to sink
+    without any relay, because the sink is the first one
+    send a announcement to them, and then they will relay
+    all their messages to it, causing them to run out of 
+    battery quickly. If the neighbouring nodes
+    are doing the same thing, it will be a strip of dead
+    nodes causing other nodes to not be able to send messages
+    because there is no way to relay messages. 
+\section{Frist try, Battey important}
+  The first attempt was to just use the battery of the other nodes
+  important, nothing else is important. If a sending node has alot of battery
+  send it to them, and if they have low battery, skip them.
+  \subsection{Result}
+    \begin{tabular}{c|c}
+      Grid topology & Comb topology\\
+      \hline
+      \hline
+      115 & 95\\
+      131 & 68\\
+      89  & 60\\
+      81  & 70\\
+      93  & 83\\
+    \end{tabular}
+  \subsection{Problem}
+    The battery itself does not seem to be a good idea by observing the results. 
+    Although the messages will be divided between the nodes depending on the battery,
+    so the nodes will die approximatly the same time, it will not cause the 
+    system to be allowed to send more messages. Probably because messages will be sent 
+    a long way, when not necessary, causing the node to spend alot of battery on 
+    every single message.
+    It does not take in to account to send messages in the wrong way.
+  \section{Second try, Battery important}
+    The previous just took the battery in to account, what if it also had
+    some notion of what was the "right way", so it could not send messages
+    back down in the graph. The "right way" being up or left, hence the sink
+    node is located in the top left corner.
+  \subsection{Result}
+    \begin{tabular}{c|c}
+      Grid topology & Comb topology\\
+      \hline
+      \hline
+      ??? & ???\\
+      ??? & ???\\
+      ??? & ???\\
+      ??? & ???\\
+      ??? & ???\\
+    \end{tabular}
+ \end{document}
