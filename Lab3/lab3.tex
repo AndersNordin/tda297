@@ -37,6 +37,8 @@
   Grid and Comb. Grid topology is a totaly symetric grid, 4 * 10 nodes.
   the Comb is the same as the previous grid, but with the exception of
   a couple of nodes taken out, making it a rather asymetric graph.
+  Each algorithm is tested five times in each grid.
+\part{Improve the basic routing}
 \section{Basic solution}
   The given program creates its route by the following algorithm.
   During anouncement phase, if the node has not already chosen an 
@@ -52,9 +54,11 @@
       141 & 91\\
       159 & 118\\
       146 & 112\\
+      \hline
+      155.2&107.2\\
     \end{tabular}
 
-  \subsection{Problem}
+  \subsection{Discussion}
     One of the problem is that it just choses the first one,
     so result will vary between each execution.
     If unlucky the nodes with distance MAXDISTANCE from
@@ -71,17 +75,21 @@
   important, nothing else is important. If a sending node has alot of battery
   send it to them, and if they have low battery, skip them.
   \subsection{Result}
-    \begin{tabular}{c|c}
-      Grid topology & Comb topology\\
+    \begin{tabular}{c|c||c|c}
+      Grid topology & Comb topology & Basic grid & Basic comb\\
       \hline
       \hline
-      115 & 95\\
-      131 & 68\\
-      89  & 60\\
-      81  & 70\\
-      93  & 83\\
+      115 & 95 & 161 & 112\\
+      131 & 68 & 169 & 103\\
+      89  & 60 & 141 & 91\\\
+      81  & 70 & 159 & 118\\
+      93  & 83 & 146 & 112\\
+      \hline
+      101.8&75.2&155.2&107.2\\
+
+      
     \end{tabular}
-  \subsection{Problem}
+  \subsection{Discussion}
     The battery itself does not seem to be a good idea by observing the results. 
     Although the messages will be divided between the nodes depending on the battery,
     so the nodes will die approximatly the same time, it will not cause the 
@@ -95,14 +103,22 @@
     back down in the graph. The "right way" being up or left, hence the sink
     node is located in the top left corner.
   \subsection{Result}
-    \begin{tabular}{c|c}
-      Grid topology & Comb topology\\
+    \begin{tabular}{c|c||c|c}
+      Grid topology & Comb topology & Basic grid & Basic comb\\
       \hline
       \hline
-      156 & 123\\
-      166 & 113\\
-      178 & 123\\
-      164 & 111\\
-      169 & 108\\
+      156 & 123 & 161 & 112\\
+      166 & 113 & 169 & 103\\
+      178 & 123 & 141 & 91\\\
+      164 & 111 & 159 & 118\\
+      169 & 108 & 146 & 112\\
+      \hline
+      166,6&115.6&155.2&107.2\\
     \end{tabular}
- \end{document}
+    \section{Discussion}
+      This seems to be preforming alot better, which was suspected. But still not a huge
+      improvement. This tells us that the distance is more importat factor than battery
+      in choosing node to send to. Although, it is a little better than the Basic algorithm
+      so it still is not to be ignored.
+\part{Clustered data aggregation}
+  \end{document}
