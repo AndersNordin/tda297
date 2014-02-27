@@ -4,14 +4,14 @@ to the group of data that is typically writtens once, read often, never modified
 and rarely deleted.
 
 The previous system used a combination of Network File System, NFS and Content
-Delivery Networks, CDN. The CDN provided a cache of 
-the most common pictures and the NFS filesystem provided them with a proven and
-a easy to maintain file system. When the system started to grow they saw problems
-with scalability, one of them being that the most popular pictures might not even be
-interesting for most of the users. They found that it was more dependent of the time
-the file had existed rather than how many that has seen the file. As you may know the
-photos uploaded most recently is the photo that is most popular. Another problem with
-the system was that in order to fetch data a lot of unnecessary information was stored
-and in order to find a single image a lot of I/O operations was needed.\\
+Delivery Networks, CDN. The CDN provided a cache of the most common pictures and
+the NFS filesystem provided them with a proven and a easy to maintain file system.
+When the system started to grow they saw problems with scalability, one of them
+being that the most popular pictures might not even be interesting for most of the
+users. They found that it was more dependent of the time the file had existed rather
+than how many that has seen the file. As you may know the photos uploaded most recently
+is the photo that is most popular. Another problem with the system was that in order
+to fetch data a lot of unnecessary information was stored and in order to find a 
+single image a lot of I/O operations was needed.\\
 
 %% Read and corrected / Anders
