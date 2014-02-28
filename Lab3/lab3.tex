@@ -121,8 +121,12 @@
       in choosing node to send to. Although, it is a little better than the Basic algorithm
       so it still is not to be ignored.
 \part{Clustered data aggregation}
+  This part of the assignment has two main difficulties, the first one is 
+  how to chose the clusters. How big the cluster should be, how the clusters
+  should be connected, how to send messages between the clusters.
+  The other being how to aggregate the messgaes, should one cluster as much
+  as possible or should the aggregation be as sparse as possible.
   \section{First try}
-    The first part of this assignment was to find a good way to cluster our nodes.
     The cluster was chosen by its row. Each row is then a single cluster. Messages
     is sent to the right as long as possible, untill it reaches the right most
     node which is then chosen as the cluster head. The cluster head has the 
