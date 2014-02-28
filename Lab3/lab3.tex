@@ -121,4 +121,24 @@
       in choosing node to send to. Although, it is a little better than the Basic algorithm
       so it still is not to be ignored.
 \part{Clustered data aggregation}
+  \section{First try}
+    The first part of this assignment was to find a good way to cluster our nodes.
+    The cluster was chosen by its row. Each row is then a single cluster. Messages
+    is sent to the right as long as possible, untill it reaches the right most
+    node which is then chosen as the cluster head. The cluster head has the 
+    responsibility to send messages between the clusters.\\
+    Then we had to solve aggregation, and hecne this could not be done between
+    rouds, we chose to do some testing in order to se how many messages a cluster
+    head could aggregate in order to get best performance.\\
+    At first thought one might be tempted to aggregate as much as possible, but
+    this can be a trap, because if a node keeps its messages too long, and then 
+    the nodes around might die, then alot of messages get lost. And also, because
+    there is no way of knowing if a message is the last message. There might be 
+    a case of when the cluster head has to throw a way messages when changing 
+    rounds (Not allowed to save messages in between rounds. Empirical testing 
+    shows that [ NUMBER HERE ] is the best choise.
+    
+    
+  \section{Discussion}
+    
   \end{document}
