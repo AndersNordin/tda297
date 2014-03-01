@@ -32,16 +32,21 @@
   good way to route a message through a sensor-network.
   First a given basic solution will be given, after that
   we will present our findings. Each solution is given with first
-  a breif description of how the algorithm find the route. Then 
+  a brief description of how the algorithm find the route. Then 
   result of the solution is given by five runs of two given topologies,
-  Grid and Comb. Grid topology is a totaly symetric grid, 4 * 10 nodes.
+  Grid and Comb. Grid topology is a totally symmetric grid, 4 * 10 nodes.
   the Comb is the same as the previous grid, but with the exception of
-  a couple of nodes taken out, making it a rather asymetric graph.
-  Each algorithm is tested five times in each grid.
+  a couple of nodes taken out, making it a rather asymmetric graph.
+  Each algorithm is tested five times in each grid.\\
+  The Program runs two different phases, the first one during 
+  which we can create a routing path for the messages called 
+  announcement phase, and a second phase called content phase where
+  messages actually will be sent. The node in which next message
+  is routed will be called router later on in this report.
 \part{Improve the basic routing}
 \section{Basic solution}
   The given program creates its route by the following algorithm.
-  During anouncement phase, if the node has not already chosen an 
+  During announcement phase, if the node has not already chosen an 
   node to route its messages through and if it is shorter
   from that node to the sink, use that node as next node.
   \subsection{Result}
@@ -62,18 +67,23 @@
     One of the problem is that it just choses the first one,
     so result will vary between each execution.
     If unlucky the nodes with distance MAXDISTANCE from
-    sinknode will send its messages all the way to sink
+    sink node will send its messages all the way to sink
     without any relay, because the sink is the first one
     send a announcement to them, and then they will relay
     all their messages to it, causing them to run out of 
-    battery quickly. If the neighbouring nodes
+    battery quickly. If the neighboring nodes
     are doing the same thing, it will be a strip of dead
     nodes causing other nodes to not be able to send messages
     because there is no way to relay messages. 
-\section{Frist try, Battey important}
-  The first attempt was to just use the battery of the other nodes
-  important, nothing else is important. If a sending node has alot of battery
-  send it to them, and if they have low battery, skip them.
+
+\section{First try, Battery important}
+  The first attempt was to just use the battery of the other nodes, 
+  nothing else is important in this algorithm. The algorithm is simple
+  and works as follows: the router will be updated to the node which 
+  has the most battery. If a router is selected and a better one
+  comes along, it will be updated, as opposed to the basic solution
+  which does not update its choice.
+  
   \subsection{Result}
     \begin{tabular}{c|c||c|c}
       Grid topology & Comb topology & Basic grid & Basic comb\\
@@ -92,16 +102,16 @@
   \subsection{Discussion}
     The battery itself does not seem to be a good idea by observing the results. 
     Although the messages will be divided between the nodes depending on the battery,
-    so the nodes will die approximatly the same time, it will not cause the 
+    so the nodes will die approximately the same time, it will not cause the 
     system to be allowed to send more messages. Probably because messages will be sent 
-    a long way, when not necessary, causing the node to spend alot of battery on 
+    a long way, when not necessary, causing the node to spend a lot of battery on 
     every single message.
     It does not take in to account to send messages in the wrong way.
-  \section{Second try, Battery important}
-    The previous just took the battery in to account, what if it also had
-    some notion of what was the "right way", so it could not send messages
-    back down in the graph. The "right way" being up or left, hence the sink
-    node is located in the top left corner.
+\section{Second try, Battery important}
+  The previous just took the battery in to account, what if it also had
+  some notion of what was the "right way", so it could not send messages
+  back down in the graph. The "right way" being up or left, hence the sink
+  node is located in the top left corner.
   \subsection{Result}
     \begin{tabular}{c|c||c|c}
       Grid topology & Comb topology & Basic grid & Basic comb\\
@@ -116,33 +126,57 @@
       166,6&115.6&155.2&107.2\\
     \end{tabular}
     \section{Discussion}
-      This seems to be preforming alot better, which was suspected. But still not a huge
-      improvement. This tells us that the distance is more importat factor than battery
+      This seems to be preforming a lot better, which was suspected. But still not a huge
+      improvement. This tells us that the distance is more important factor than battery
       in choosing node to send to. Although, it is a little better than the Basic algorithm
       so it still is not to be ignored.
 \part{Clustered data aggregation}
   This part of the assignment has two main difficulties, the first one is 
   how to chose the clusters. How big the cluster should be, how the clusters
   should be connected, how to send messages between the clusters.
-  The other being how to aggregate the messgaes, should one cluster as much
+  The other being how to aggregate the messages, should one cluster as much
   as possible or should the aggregation be as sparse as possible.
   \section{First try}
     The cluster was chosen by its row. Each row is then a single cluster. Messages
-    is sent to the right as long as possible, untill it reaches the right most
+    is sent to the right as long as possible, until it reaches the right most
     node which is then chosen as the cluster head. The cluster head has the 
     responsibility to send messages between the clusters.\\
-    Then we had to solve aggregation, and hecne this could not be done between
-    rouds, we chose to do some testing in order to se how many messages a cluster
+    Then we had to solve aggregation, and hence this could not be done between
+    rounds, we chose to do some testing in order to see how many messages a cluster
     head could aggregate in order to get best performance.\\
     At first thought one might be tempted to aggregate as much as possible, but
     this can be a trap, because if a node keeps its messages too long, and then 
-    the nodes around might die, then alot of messages get lost. And also, because
+    the nodes around might die, then a lot of messages get lost. And also, because
     there is no way of knowing if a message is the last message. There might be 
     a case of when the cluster head has to throw a way messages when changing 
     rounds (Not allowed to save messages in between rounds. Empirical testing 
-    shows that [ NUMBER HERE ] is the best choise.
+    shows that [ NUMBER HERE ] is the best choice.
     
     
   \section{Discussion}
-    
+  This part of the problem has sparked a lot of thinking and discussion about what
+  is important, and how to make the solution as good as possible. Using clustering 
+  it is possible to make the nodes run out of battery at quite similar time, which
+  is a great performance boost, but not a huge difference from the first solution.
+  When the aggregation of messages was tested the first time, it showed that the
+  solution could be as good as double. Which is not that hard to believe, the nodes
+  spend only half their battery to send a message. What is important to understand
+  we think is that nodes that connect to the sink is very precious. If they die, 
+  everything dies. But when data is aggregated, it is a bigger loss when a node
+  dies.\\
+  In our solution we used rows as clusters. And the first try we used the right-most
+  node as cluster head. After some tries it made for grim results, the solution 
+  was not even as good as the basic solution. The thinking was that the nodes
+  to the right was used the least, so try to use them as much as possible to
+  even out the load. This was not the case when tested, the result was that
+  the nodes sent messages in the wrong direction, so each message had to take a 
+  longer path than it could do, and the right most would be used as soon as the
+  left had died, so no performance boost was given at all. We found that it
+  was better in all cases to use a solution where the leftmost
+  was used as apposed to the rightmost. Further improvements that could be done
+  that we may have overlooked is that in this solution is make use of battery
+  as in Part I. More important in this part is how the aggregation is done
+  and make sure that messages containing a lot of data does not get lost or
+  disappear. 
+
   \end{document}
