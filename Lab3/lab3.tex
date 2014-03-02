@@ -81,7 +81,7 @@
   nothing else is important in this algorithm. The algorithm is simple
   and works as follows: the router will be updated to the node which 
   has the most battery. If a router is selected and a better one
-  comes along, it will be updated, as opposed to the basic solution
+  comes along, it will be updated, as apposed to the basic solution
   which does not update its choice.
   
   \subsection{Result}
@@ -139,7 +139,7 @@
   as possible or should the aggregation be as sparse as possible.
   \section{First try}
    The cluster was chosen by its row. Each row is then a single cluster. Messages
-   is sent to the right as long as possible, until it reaches the rightmost
+   is sent to the right as long as possible, until it reaches the right most
    node which is then chosen as the cluster head. The cluster head has the
    responsibility to send messages between the clusters.\\
    Then we had to solve aggregation, and hence this could not be done between
@@ -164,7 +164,7 @@
   we think is that nodes that connect to the sink is very precious. If they die, 
   everything dies. But when data is aggregated, it is a bigger loss when a node
   dies.\\
-  In our solution we used rows as clusters. And the first try we used the right-most
+  In our solution we used rows as clusters. And the first try we used the right most
   node as cluster head. After some tries it made for grim results, the solution 
   was not even as good as the basic solution. The thinking was that the nodes
   to the right was used the least, so try to use them as much as possible to
@@ -173,7 +173,7 @@
   longer path than it could do, and the right most would be used as soon as the
   left had died, so no performance boost was given at all. We found that it
   was better in all cases to use a solution where the leftmost
-  was used as apposed to the rightmost. Further improvements that could be done
+  was used as apposed to the right most. Further improvements that could be done
   that we may have overlooked is that in this solution is make use of battery
   as in Part I. More important in this part is how the aggregation is done
   and make sure that messages containing a lot of data does not get lost or
