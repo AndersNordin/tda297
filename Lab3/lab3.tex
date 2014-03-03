@@ -151,7 +151,8 @@
    there is no way of knowing if a message is the last message in the round. There might be
    a case of when the cluster head has to throw away messages when changing
    rounds (Not allowed to save messages in between rounds. Empirical testing
-   shows that [ NUMBER HERE ] is the best choice.
+   shows that 2 is the best choice. Less then 2, then it is no aggregation at all
+   more, then a loss will cause much more damage. 
      
   \section{Discussion}
   This part of the problem has sparked a lot of thinking and discussion about what
@@ -164,23 +165,25 @@
   we think is that nodes that connect to the sink is very precious. If they die, 
   everything dies. But when data is aggregated, it is a bigger loss when a node
   dies.\\
-  In our solution we used rows as clusters. And the first try we used the right most
-  node as cluster head. After some tries it made for grim results, the solution 
+  \section{Failed improvements}
+  In our solution we used single rows as clusters. And the first try we used the 
+  right most node as cluster head. After some tries it made for grim results, the solution 
   was not even as good as the basic solution. The thinking was that the nodes
   to the right was used the least, so try to use them as much as possible to
   even out the load. This was not the case when tested, the result was that
   the nodes sent messages in the wrong direction, so each message had to take a 
   longer path than it could do, and the right most would be used as soon as the
   left had died, so no performance boost was given at all. We found that it
-  was better in all cases to use a solution where the leftmost
-  was used as apposed to the right most. Further improvements that could be done
+  was better in all cases to use a solution where the left most
+  was used as apposed to the right most. Further improvements that tried be done
   that we may have overlooked is that in this solution is make use of battery
   as in Part I. More important in this part is how the aggregation is done
   and make sure that messages containing a lot of data does not get lost or
-  disappear. If every second message is aggregated, the message will be
-  "worth" atleast the amount that the aggregated was and the second incomming
-  is too. What might be a good idea is that if message get worth up to a
+  disappear. Every second message is aggregated in our solution, the message 
+  will be "worth" atleast the amount that the aggregated was and the second incomming
+  is too. What we thought might be a good idea is that if message get worth up to a
   specific amount, send them, and if less than keep aggregateing. Save messages
-  according to how much is aggregated, not how many messages.
+  according to how much is aggregated, not how many messages. This turned out to
+  be a not so good solution.
 
   \end{document}
