@@ -137,7 +137,7 @@
   should be connecte and how to send messages between the clusters.
   The other being how to aggregate the messages, should one cluster aggregate as much
   as possible or should the aggregation be as sparse as possible.
-  \section{First try}
+  \section{Algorithm}
    The cluster was chosen by its row. Each row is then a single cluster. Messages
    is sent to the right as long as possible, until it reaches the right most
    node which is then chosen as the cluster head. The cluster head has the
@@ -153,7 +153,6 @@
    rounds (Not allowed to save messages in between rounds. Empirical testing
    shows that 2 is the best choice. Less then 2, then it is no aggregation at all
    more, then a loss will cause much more damage. 
-     
   \section{Discussion}
   This part of the problem has sparked a lot of thinking and discussion about what
   is important, and how to make the solution as good as possible. Using clustering 
@@ -164,7 +163,7 @@
   spend only half their battery to send a message. What is important to understand
   we think is that nodes that connect to the sink is very precious. If they die, 
   everything dies. But when data is aggregated, it is a bigger loss when a node
-  dies.\\
+  dies.
   \section{Failed improvements}
   In our solution we used single rows as clusters. And the first try we used the 
   right most node as cluster head. After some tries it made for grim results, the solution 
