@@ -119,7 +119,7 @@
       \hline
       156 & 123 & 161 & 112\\
       166 & 113 & 169 & 103\\
-      178 & 123 & 141 & 91\\\
+      178 & 123 & 141 & 91 \\
       164 & 111 & 159 & 118\\
       169 & 108 & 146 & 112\\
       \hline
@@ -153,6 +153,21 @@
    rounds (Not allowed to save messages in between rounds. Empirical testing
    shows that 2 is the best choice. Less then 2, then it is no aggregation at all
    more, then a loss will cause much more damage. 
+
+  \subsection{Result}
+    \begin{tabular}{c|c||c|c}
+      Grid topology & Comb topology & Part I grid & Part I comb\\
+      \hline
+      \hline
+     175 &126  &156 & 123 \\
+     193 &134  &166 & 113 \\
+     166 &115  &178 & 123 \\
+     195 &132  &164 & 111 \\
+     210 &125  &169 & 108 \\
+      \hline
+      186.8&126.4&166.6&115.6\\
+    \end{tabular}
+
   \section{Discussion}
   This part of the problem has sparked a lot of thinking and discussion about what
   is important, and how to make the solution as good as possible. Using clustering 
@@ -184,5 +199,13 @@
   specific amount, send them, and if less than keep aggregateing. Save messages
   according to how much is aggregated, not how many messages. This turned out to
   be a not so good solution.
+  \section{Further work}
+  Due to limitation in time we could not test every possible solution. Some 
+  of these things we have talked with other groups, and also discussed among
+  eachother. The first thing about or solution that could be further examined
+  is how the cluster is created. The cluster could with good result be created
+  so that each node within the cluster is reachable. That makes it easy to see
+  how many nodes that are alive during anouncement phase. It can therefore 
+  use this fact to do furhter improvements in aggregation of messages.
 
   \end{document}
