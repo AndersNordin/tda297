@@ -127,7 +127,7 @@
       \hline
       166,6&115.6&155.2&107.2\\
     \end{tabular}
-    \section{Discussion}
+    \subsection{Discussion}
      This seems to be performing a lot better, which was suspected. But still not a huge
      improvement. This tells us that the distance is a more important factor than battery
      in choosing node to send to. Although, it is a little better than the Basic algorithm
@@ -142,11 +142,13 @@
   should be connecte and how to send messages between the clusters.
   The other being how to aggregate the messages, should one cluster aggregate as much
   as possible or should the aggregation be as sparse as possible.
-  \section{Algorithm}
+  \section{Clustered solution}
    The cluster was chosen by its row. Each row is then a single cluster. Messages
    is sent to the right as long as possible, until it reaches the right most
    node which is then chosen as the cluster head. The cluster head has the
-   responsibility to send messages between the clusters.\\
+   responsibility to send messages between the clusters. We found that
+   we could do improvements from the former part and use length between the
+   nodes as an input.\\
    Then we had to solve aggregation, and hence this could not be done between
    rounds, we chose to do some testing in order to see how many messages a cluster
    head could aggregate in order to get best performance.\\
@@ -164,16 +166,17 @@
       Grid topology & Comb topology & Part I grid & Part I comb\\
       \hline
       \hline
-      175 &126  &156 & 123 \\
-      193 &134  &166 & 113 \\
-      166 &115  &178 & 123 \\
-      195 &132  &164 & 111 \\
-      210 &125  &169 & 108 \\
+      221 &246  &156 & 123 \\
+      190 &224  &166 & 113 \\
+      206 &170  &178 & 123 \\
+      195 &261  &164 & 111 \\
+      217 &135  &169 & 108 \\
       \hline
-      186.8&126.4&166.6&115.6\\
+      204.8&207.2&166.6&115.6\\
     \end{tabular}
 
-  \section{Discussion}
+
+  \subsection{Discussion}
     This part of the problem has sparked a lot of thinking and discussion about what
     is important when choosing router, and how to make the solution as good as possible. 
     Using clustering it is possible to make the nodes run out of battery at quite similar 
@@ -186,7 +189,7 @@
     But when data is aggregated, it is a bigger loss when a node dies. An observation
     we have done is that the result varys alot more now when we added aggregation. 
 
-  \section{Failed improvements}
+  \subsection{Failed improvements}
     In our solution we used single rows as clusters. And the first try we used the 
     right most node as cluster head. After some tries it made for grim results, the solution 
     was not even as good as the basic solution. The thinking was that the nodes
