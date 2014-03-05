@@ -29,27 +29,23 @@
 \tableofcontents
 \newpage
 \section{Introduction}
-  This report will discuss and try to find a good solution in finding a 
-  good way to route a message through a sensor-network.
+  This report will discuss how to improve routing algorithm in a sensor network.
   First a given basic solution will be given, after that
   we will present our findings. Each solution is first given with
-  a brief description of how the algorithm finds the route. Then 
+  a brief description of how the algorithm finds the route. Then the
   result of the solution is given by five runs of two given topologies,
   Grid and Comb. Grid topology is a totally symmetric grid, 4 times 10 nodes.
   The Comb is the same as the previous grid, but with the exception of
-  a couple of nodes taken out, making it a rather asymmetric graph.
-  Each algorithm is tested five times in each grid.\\
-  The Program runs two different phases, the first one during 
-  which we can create a routing path for the messages called 
-  announcement phase, and a second phase called content phase where
+  a couple of nodes taken out, making it a rather asymmetric graph.\\
+  The Program runs two different phases, the first one, where the routing path is set up, is called announcement phase, the second phase is called content phase where
   messages actually will be sent. The node in which next message
-  is routed will be called router further on in this report.
+  is routed will be referred to as router further on in this report.
 \part{Improve the basic routing}
 \section{Basic solution}
   The given program creates its route by the following algorithm.
-  During announcement phase, if the node has not already chosen an 
-  node to route its messages through and if it is shorter
-  from that node to the sink, use that node as next node.
+  During announcement phase, if the node has not already chosen a 
+  node to route its messages through and if the senders distance is shorter
+  to the sink, use that node as next node.
   \subsection{Result}
     \begin{tabular}{c|c}
       Grid topology & Comb topology\\
@@ -70,19 +66,19 @@
    If unlucky the nodes with distance MAXDISTANCE from
    sink node will send its messages all the way to sink
    without any relay, because the sink is the first one
-   send a announcement to them, and then they will relay
+   to send a announcement to them, and then they will relay
    all their messages to it, causing them to run out of
-   battery quickly. If the neighboring nodes
+   battery quickly. If the neighbouring nodes
    are doing the same thing, it will be a strip of dead
    nodes causing other nodes to be unable to send messages
-   because there is no way to relay messages.
+   because there is no way to relay messages. 
 
-\section{First try, Battery important}
-  The first attempt was to just use the battery of the other nodes, 
+\section{Focus on battery, first try}
+  The first attempt was to just focus on the battery of the other nodes, 
   nothing else is important in this algorithm. The algorithm is simple
-  and works as follows: The router will check all incomming announcements
+  and works as follows: The router will check all incoming announcements
   and then depending on which one that has the most battery, select it as
-  new router.  
+  router.  
   \subsection{Result}
     \begin{tabular}{c|c||c|c}
       Grid topology & Comb topology & Basic grid & Basic comb\\
@@ -100,19 +96,19 @@
     \end{tabular}
   \subsection{Discussion}
     The algorithm differs from the basic solution in one crucial part, it chooses
-    router by checking all the incomming announcements, not only one is examined.
+    router by checking all the incoming announcements, not just a single node is examined.
     The battery itself does not seem to be a good idea by observing the results.
     Although the messages will be divided between the nodes depending on the battery,
-    so the nodes will die approximately the same time, it will not cause the
+    so the nodes will die approximately at the same time, it will not cause the
     system to be allowed to send more messages. Probably because messages will be sent
     a long way, when not necessary, causing the node to spend a lot of battery on
     every single message.
     It does not take into account to send messages in the wrong way.
-\section{Second try, Battery important}
+\section{Focus on battery, second try}
   The previous just took the battery into account, what if it also had
   some notion of what was the "right way", so it could not send messages
   back down in the graph. The "right way" being up or left, hence the sink
-  node is located in the top left corner. This algorithm choses the best
+  node is located in the top left corner. This algorithm chooses the best
   battery if it is on the "right way" to the router.
   \subsection{Result}
     \begin{tabular}{c|c||c|c}
@@ -139,12 +135,12 @@
 \part{Clustered data aggregation}
   This part of the assignment has two main difficulties, the first one is 
   how to the clusters should work meaning, how big the cluster should be, how the clusters
-  should be connecte and how to send messages between the clusters.
+  should be connected and how to send messages between the clusters.
   The other being how to aggregate the messages, should one cluster aggregate as much
   as possible or should the aggregation be as sparse as possible.
   \section{Clustered solution}
    The cluster was chosen by its row. Each row is then a single cluster. Messages
-   is sent to the right as long as possible, until it reaches the right most
+   is sent to the right as long as possible, until it reaches the right-most
    node which is then chosen as the cluster head. The cluster head has the
    responsibility to send messages between the clusters. We found that
    we could do improvements from the former part and use length between the
@@ -154,10 +150,10 @@
    head could aggregate in order to get best performance.\\
    At first thought one might be tempted to aggregate as much as possible, but
    this can be a trap, because if a node keeps its messages too long, and then
-   the nodes around might die, then a lot of messages get lost. And also, because
+   the nodes surrounding might die, then a lot of messages get lost. And also, because
    there is no way of knowing if a message is the last message in the round. There might be
    a case of when the cluster head has to throw away messages when changing
-   rounds (Not allowed to save messages in between rounds. Empirical testing
+   rounds(not allowed to save messages in between rounds). Empirical testing
    shows that 2 is the best choice. Less then 2, then it is no aggregation at all
    more, then a loss will cause much more damage. 
 
@@ -179,50 +175,47 @@
   \subsection{Discussion}
     This part of the problem has sparked a lot of thinking and discussion about what
     is important when choosing router, and how to make the solution as good as possible. 
-    Using clustering it is possible to make the nodes run out of battery at quite similar 
+    Using clustering it is possible to make the nodes run out of battery at about the same 
     time, which is a great performance boost, but not a huge difference from the first solution
-    at first. When the aggregation of messages was tested for the first time, it showed that the
-    solution could be as good as double, although during this time tried all nodes, not only
-    cluster head, aggregated messages. This is as expected, the nodes are sending double the
-    messages using the same battery as before. What is important to understand we think is 
+    at first look. When the aggregation of messages was tested for the first time, it showed that the
+    solution could be as good as double, although during this time all nodes tried, not only
+    cluster head, to aggregated messages. This was expected, since the nodes are sending double the
+    messages using the same battery as before. What is important to understand is 
     that nodes that connect to the sink is very precious. If they die, everything dies. 
     But when data is aggregated, it is a bigger loss when a node dies. An observation
-    we have done is that the result varys alot more now when we added aggregation. 
+    is that the result varies a lot more now when we added aggregation. 
 
   \subsection{Failed improvements}
     In our solution we used single rows as clusters. And the first try we used the 
-    right most node as cluster head. After some tries it made for grim results, the solution 
+    right-most node as cluster head. After some tries it made for grim results, the solution 
     was not even as good as the basic solution. The thinking was that the nodes
     to the right was used the least, so try to use them as much as possible to
     even out the load. This was not the case when tested, the result was that
     the nodes sent messages in the wrong direction, so each message had to take a 
-    longer path than it could do, and the right most would be used as soon as the
+    longer path than it should do, and the right-most would be used as soon as the
     left had died, so no performance boost was given at all. We found that it
-    was better in all cases to use a solution where the left most as cluster head 
-    as opposed to the right most. More important in this part is how the aggregation 
-    is done and make sure that messages containing a lot of data does not get lost or
-    disappear. 
+    was better in all cases to use a solution where the left-most node was cluster head 
+    as opposed to the right-most. More important in this part is how the aggregation 
+    is done and make sure that messages containing a lot of data that does not get lost.
     Every two message is aggregated in our solution, that means that the cluster head will
     gather two messages, then send it further to the other nodes, where it will propagate
-    furhter in the network untill it arrives at a cluster head where that cluster head
+    further in the network until it arrives at a cluster head where that cluster head
     might save the message. The message will then be "worth" atleast the amount that 
-    the aggregated was and the second incomming is too. What we thought might be a 
-    good idea is that if message get worth up to a specific amount, send them, and 
-    if less than keep aggregateing. Save messages according to how much is aggregated, 
-    not how many messages. This turned out to be a not so good solution, even if the 
-    thought might be good. We get much better results by just aggregating two messages,
-    no more no less, and not dependent of where the messages might have been before.
+    the aggregated was and the second incoming is too. What we thought that if messages
+    get worth up to a specific amount, send them, and if less than keep aggregating. 
+    Save messages according to how much is aggregated, not how many messages. 
+    This turned out to be a not so good solution. We get much better results by just 
+    aggregating two messages, no more no less, and not dependent of where the messages 
+    might have been before.
 
   \section{Further work}
-    Due to limitation in time we could not test every possible solution. Some 
-    of these things we have talked with other groups, and also discussed among
-    eachother. The first thing about or solution that could be further examined
+    Due to limitation in time we could not test all ideas.
+    The first thing about or solution that could be further examined
     is how the cluster is created. The cluster could with good result be created
     so that each node within the cluster is reachable. That makes it easy to see
-    how many nodes that are alive during anouncement phase. It can therefore 
-    use this fact to do furhter improvements in aggregation of messages.
+    how many nodes that are alive during announcement phase. It can therefore 
+    use this fact to do further improvements in aggregation of messages.
     Improvements from Part I did not yield much improvements at all, but it might 
-    be a good solution to se if that solution could be tweaked and then implement
-    the better one. It is time well spent hence aggregation will make the improvement
-    more "worth".
+    be a good solution to see if that solution could be tweaked and then implement as a better one. 
+    It is time well spent hence aggregation will make the improvement more worth.
   \end{document}
